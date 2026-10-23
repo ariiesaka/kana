@@ -10,6 +10,8 @@ kana is a static app at this stage. accounts, saved progress, and streaks are id
 
 ## run locally
 
+use node.js 24 and the pnpm version declared in [package.json](package.json).
+
     pnpm install
     pnpm dev
 

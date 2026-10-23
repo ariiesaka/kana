@@ -24,5 +24,3 @@ Keep the home screen minimalist and compact.
 
 ## Open decisions
 - How learners choose hiragana, katakana, or mixed content after choosing a practice mode.
-
-FORM: seed:4488333a193086ed

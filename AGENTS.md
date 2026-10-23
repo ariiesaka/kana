@@ -20,5 +20,6 @@ For settled domain terminology and architecture decisions, use root GLOSSARY.md 
 - Before opening a pull request, run the Matt Pocock code-review skill against the fixed point the user supplied. For PRs targeting master, use origin/master when the user confirms it. Review Standards and Spec separately, using the feature's Obsidian spec and ticket as the acceptance source. If the fixed point does not resolve or the diff is empty, stop and report that.
 - Resolve review findings before opening the pull request, or get the user's decision on any finding that should remain.
 - After the user asks for a pull request, push only the feature branch and target master.
-- For every UI change, include real browser screenshots of before and after states in the pull request description. Include a mobile screenshot when the change affects responsive behavior.
+- For every UI change, include real before/after browser screenshots in the PR description, including mobile when responsive behavior changes. Store local captures in .scratch/ and link or attach evidence in the PR; keep review-only images out of tracked files.
+- Keep local editor settings in ignored .vscode/. Commit the app source, shared tool configuration, and dependency lockfile.
 - Never push, force-push, or delete master; merge through a pull request.

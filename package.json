@@ -1,6 +1,10 @@
 {
   "name": "kana",
   "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": "24.x"
+  },
   "type": "module",
   "imports": {
     "#/*": "./src/*"
