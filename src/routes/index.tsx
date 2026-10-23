@@ -56,8 +56,7 @@ function Home() {
         </p>
 
         <p className="mode-status" id="mode-status">
-          practice activities are coming soon, ordered from more guidance to
-          recall.
+          practice activities are coming soon.
         </p>
         <ul
           className="mode-list"
