@@ -4,17 +4,17 @@ const practiceModes = [
   {
     id: 'multiple-choice',
     name: 'multiple choice',
-    description: 'choose the romaji that matches each kana.',
+    description: 'choose the romaji that matches each kana',
   },
   {
     id: 'matching',
     name: 'matching',
-    description: 'pair romaji labels with kana.',
+    description: 'pair romaji labels with kana',
   },
   {
     id: 'flashcards',
     name: 'flashcards',
-    description: 'try to recall the reading before revealing the answer.',
+    description: 'try to recall the reading before revealing the answer',
   },
 ]
 
@@ -31,7 +31,7 @@ function Home() {
 
       <main className="home">
         <h1>how would you like to practice?</h1>
-        <p className="intro">choose a way to practice reading kana.</p>
+        <p className="intro">choose a way to practice reading kana</p>
         <p className="kana-example">
           <span className="example-label">for example</span>
           <span className="sr-only">hiragana </span>
@@ -52,11 +52,11 @@ function Home() {
           <span className="example-reading">a</span>
         </p>
         <p className="example-note">
-          romaji uses roman letters to show how kana sound.
+          romaji uses roman letters to show how kana sound
         </p>
 
         <p className="mode-status" id="mode-status">
-          choose your kana in multiple choice. practice is coming soon.
+          choose your kana in multiple choice — practice is coming soon
         </p>
         <ul
           className="mode-list"

@@ -39,7 +39,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 - Product name: Kana.
 - The user prefers dark mode as the default theme.
 - Use the Quiet Reader direction: a minimalist, compact, text-led activity list.
-- Keep visible interface copy lowercase.
+- Keep visible interface copy lowercase and omit sentence-ending periods.
 - Use the lowercase k favicon.
 
 ## Evidence on Hand

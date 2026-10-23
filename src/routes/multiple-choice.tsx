@@ -20,7 +20,7 @@ function MultipleChoiceSetup() {
       <main className="home setup">
         <Link className="setup-back" to="/">← activities</Link>
         <h1>multiple choice</h1>
-        <p className="intro">choose which kana you’d like to read.</p>
+        <p className="intro">choose which kana you’d like to read</p>
 
         <fieldset className="script-fieldset">
           <legend>kana to practice</legend>
@@ -41,17 +41,17 @@ function MultipleChoiceSetup() {
             ))}
           </div>
         </fieldset>
-        <p className="setup-caption">new to kana? hiragana is a good place to begin.</p>
+        <p className="setup-caption">new to kana? hiragana is a good place to begin</p>
         <div className="setup-footer">
           <div className="setup-instructions">
-            <p className="setup-hint">choose the matching romaji.</p>
-            <p className="setup-definition">romaji uses roman letters to show how kana sound.</p>
+            <p className="setup-hint">choose the matching romaji</p>
+            <p className="setup-definition">romaji uses roman letters to show how kana sound</p>
           </div>
           <button className="start-practice" type="button" disabled aria-describedby="practice-status">
             start practice <span aria-hidden="true">→</span>
           </button>
         </div>
-        <p className="practice-status" id="practice-status">practice is coming soon.</p>
+        <p className="practice-status" id="practice-status">practice is coming soon</p>
       </main>
     </>
   )
