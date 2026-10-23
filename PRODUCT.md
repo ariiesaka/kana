@@ -30,7 +30,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 
 - Initial release is static and does not require accounts.
 - The home screen offers multiple choice, matching, and flashcards as practice-format choices, ordered from more guidance to recall.
-- Detailed activity flows are not defined yet.
+- Multiple choice opens a kana-led setup with hiragana, katakana, or both. Practice sessions are coming soon.
 - Login, saved progress, and streaks are long-term ideas.
 - The home screen is designed before its practice flows.
 
@@ -40,6 +40,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 - The user prefers dark mode as the default theme.
 - Use the Quiet Reader direction: a minimalist, compact, text-led activity list.
 - Keep visible interface copy lowercase.
+- Use the lowercase k favicon.
 
 ## Evidence on Hand
 

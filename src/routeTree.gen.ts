@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MultipleChoiceRouteImport } from './routes/multiple-choice'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MultipleChoiceRoute = MultipleChoiceRouteImport.update({
+  id: '/multiple-choice',
+  path: '/multiple-choice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/multiple-choice': typeof MultipleChoiceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/multiple-choice': typeof MultipleChoiceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/multiple-choice': typeof MultipleChoiceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/multiple-choice'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/multiple-choice'
+  id: '__root__' | '/' | '/multiple-choice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MultipleChoiceRoute: typeof MultipleChoiceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/multiple-choice': {
+      id: '/multiple-choice'
+      path: '/multiple-choice'
+      fullPath: '/multiple-choice'
+      preLoaderRoute: typeof MultipleChoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MultipleChoiceRoute: MultipleChoiceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

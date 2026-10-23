@@ -4,7 +4,7 @@ a small study tool for beginners learning to read hiragana and katakana. the aim
 
 ## current step
 
-the home screen introduces three planned practice formats in order from more guidance to recall: multiple choice, matching, then flashcards. it explains each format and shows あ / ア → a as an example of the same reading in both scripts. the activities are marked as coming soon and remain non-interactive in this step.
+the home screen introduces three planned practice formats in order from more guidance to recall: multiple choice, matching, then flashcards. it explains each format and shows あ / ア → a as an example of the same reading in both scripts. multiple choice opens a setup screen to choose hiragana, katakana, or both. practice sessions, matching, and flashcards are coming soon.
 
 kana is a static app at this stage. accounts, saved progress, and streaks are ideas for later.
 
