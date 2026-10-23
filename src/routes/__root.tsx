@@ -17,7 +17,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'description',
-        content: 'reading practice for hiragana and katakana.',
+        content: 'reading practice for hiragana and katakana',
       },
     ],
     links: [

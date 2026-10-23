@@ -13,7 +13,7 @@ Multiple Choice, Matching, or Flashcards, ordered from more guidance to recall.
 A compact activity list.
 
 ## Copy style
-Use lowercase for visible interface copy.
+Use lowercase for visible interface copy and omit sentence-ending periods.
 
 ## Scope
 Design the study home screen only. The practice activities and their session flows come later.
