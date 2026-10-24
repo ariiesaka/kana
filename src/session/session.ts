@@ -242,7 +242,7 @@ export function grade(session: Session, verdict: Grade, now: Date): Session {
     queue: [...rest.slice(0, gap), card, ...rest.slice(gap)],
     progress: progressFor(1),
     sinceStop,
-    missed: session.missed.includes(card)
+    missed: session.missed.some((missed) => missed.id === card.id)
       ? session.missed
       : [...session.missed, card],
   }

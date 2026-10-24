@@ -112,12 +112,15 @@ function Practice() {
             aria-labelledby="summary-heading"
           >
             <h2 id="summary-heading">
-              {session.missed.length === 0 ? 'no misses' : 'missed so far'}
+              {session.missed.length === 0 ? 'no misses' : 'missed'}
             </h2>
             {session.missed.length > 0 && (
               <ul className="summary-missed" lang="ja">
                 {session.missed.map((missed) => (
-                  <li key={missed.id}>{missed.kana}</li>
+                  <li key={missed.id}>
+                    {missed.kana}
+                    <span className="sr-only">, {missed.romaji}</span>
+                  </li>
                 ))}
               </ul>
             )}
