@@ -9,10 +9,22 @@ import {
   isFinished,
   type Session,
   startSession,
+  studyDay,
 } from './session'
 
 const vowels = cardsOfGroup('vowels', 'hiragana')
 const [a, i, u, e, o] = vowels
+
+// a fixed moment in the middle of a study day, local time
+const NOW = new Date(2026, 9, 26, 10, 0)
+const TODAY = studyDay(NOW)
+
+// progress for a card that is already in a box and due today
+const saved = (box: number, due = TODAY) => ({
+  box,
+  due,
+  introduced: TODAY - 5,
+})
 
 // grade the current card with each grade in turn, returning the kana shown
 function play(session: Session, grades: Grade[]) {
@@ -20,7 +32,7 @@ function play(session: Session, grades: Grade[]) {
   let next = session
   for (const verdict of grades) {
     shown.push(currentCard(next)?.kana ?? '')
-    next = grade(next, verdict)
+    next = grade(next, verdict, NOW)
   }
   shown.push(currentCard(next)?.kana ?? '')
   return { shown, session: next }
@@ -41,7 +53,7 @@ describe('starting a session', () => {
   })
 
   test('keeps boxes the learner already has', () => {
-    const session = startSession(vowels, { [i.id]: { box: 3 } })
+    const session = startSession(vowels, { [i.id]: saved(3) })
     expect(boxOf(session, i)).toBe(3)
     expect(boxOf(session, a)).toBe(1)
   })
@@ -49,18 +61,18 @@ describe('starting a session', () => {
 
 describe('knew it', () => {
   test('moves the card up one box and shows the next card', () => {
-    const next = grade(startSession(vowels), 'knew')
+    const next = grade(startSession(vowels), 'knew', NOW)
     expect(boxOf(next, a)).toBe(2)
     expect(currentCard(next)).toEqual(i)
   })
 
   test('never goes past the top box', () => {
-    const top = startSession([a], { [a.id]: { box: BOX_COUNT } })
-    expect(boxOf(grade(top, 'knew'), a)).toBe(BOX_COUNT)
+    const top = startSession([a], { [a.id]: saved(BOX_COUNT) })
+    expect(boxOf(grade(top, 'knew', NOW), a)).toBe(BOX_COUNT)
   })
 
   test('leaves the other cards in their boxes', () => {
-    const next = grade(startSession(vowels), 'knew')
+    const next = grade(startSession(vowels), 'knew', NOW)
     for (const card of [i, u, e, o]) expect(boxOf(next, card)).toBe(1)
   })
 
@@ -78,8 +90,8 @@ describe('knew it', () => {
 
 describe('missed', () => {
   test('puts the card back in box 1', () => {
-    const session = startSession(vowels, { [a.id]: { box: 3 } })
-    expect(boxOf(grade(session, 'missed'), a)).toBe(1)
+    const session = startSession(vowels, { [a.id]: saved(3) })
+    expect(boxOf(grade(session, 'missed', NOW), a)).toBe(1)
   })
 
   test('brings the card back after 3 other cards', () => {
@@ -125,12 +137,12 @@ describe('finishing', () => {
 
   test('grading a finished session changes nothing', () => {
     const { session } = play(startSession([a]), ['knew'])
-    expect(grade(session, 'missed')).toEqual(session)
+    expect(grade(session, 'missed', NOW)).toEqual(session)
   })
 
   test('grading never changes the session it was given', () => {
     const session = startSession(vowels)
-    grade(session, 'missed')
+    grade(session, 'missed', NOW)
     expect(currentCard(session)).toEqual(a)
     expect(boxOf(session, a)).toBe(1)
   })

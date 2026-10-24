@@ -4,9 +4,9 @@ a small study tool for beginners learning to read hiragana and katakana. the aim
 
 ## current step
 
-the home screen introduces three planned practice formats in order from more guidance to recall: multiple choice, matching, then flashcards. it explains each format and shows あ / ア → a as an example of the same reading in both scripts. flashcards open a first session on the vowels in hiragana: see a kana, show the answer, then say whether you knew it or missed it. multiple choice opens a setup screen to choose hiragana, katakana, or both. multiple choice practice and matching are coming soon.
+the home screen introduces three planned practice formats in order from more guidance to recall: multiple choice, matching, then flashcards. it explains each format and shows あ / ア → a as an example of the same reading in both scripts. flashcards open a session on the vowels in hiragana: see a kana, show the answer, then say whether you knew it or missed it. boxes decide when a card comes back, and your progress is saved in this browser. multiple choice opens a setup screen to choose hiragana, katakana, or both. multiple choice practice and matching are coming soon.
 
-kana is a static app at this stage, with no accounts. flashcards will save progress in this browser only, which is not built yet (see [the decision](docs/adr/0001-local-progress-in-browser-storage.md)). syncing across devices and streaks are ideas for later.
+kana is a static app at this stage, with no accounts. flashcards save progress in this browser only (see [the decision](docs/adr/0001-local-progress-in-browser-storage.md)). syncing across devices and streaks are ideas for later.
 
 ## run locally
 
