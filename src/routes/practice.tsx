@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { allCards, counterpart } from '#/kana/kana'
+import { counterpart } from '#/kana/kana'
 import {
   buildQueue,
   currentCard,
   type Grade,
   grade,
   isFinished,
+  poolFor,
   startSession,
 } from '#/session/session'
 import { progressStore } from '#/storage/progress-store'
@@ -16,14 +17,13 @@ export const Route = createFileRoute('/practice')({
   component: Practice,
 })
 
-// the cards that can be practiced for now: all of hiragana, in learning order;
-// new cards come from one group at a time as the earlier groups become reliable
-const pool = allCards('hiragana')
-
 function Practice() {
   // saved progress decides what is due today; this runs once, when the screen opens
   const [initial] = useState(() => {
     const progress = progressStore.load()
+    // the script choice decides which cards can be practiced; new cards come
+    // from one group at a time as the earlier groups become reliable
+    const pool = poolFor(progressStore.loadSettings().scripts)
     const queue = buildQueue(pool, progress, new Date())
     return { session: startSession(queue, progress), count: queue.length }
   })

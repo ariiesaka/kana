@@ -28,7 +28,7 @@ const choices: Array<{
     id: 'both',
     name: 'hiragana and katakana',
     example: 'あ ア',
-    description: 'katakana practice is coming soon',
+    description: 'katakana follows each group',
   },
 ]
 
