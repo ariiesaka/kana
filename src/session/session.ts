@@ -35,10 +35,22 @@ export type CardProgress = {
 
 export type Progress = Readonly<Record<string, CardProgress>>
 
+// a short summary appears after about this many cards; tunable
+export const SUMMARY_AFTER = 10
+
+// extra practice holds at most this many cards; tunable
+export const EXTRA_PRACTICE_SIZE = 10
+
 export type Session = {
   // cards still to show; the first one is the current card
   readonly queue: ReadonlyArray<Card>
   readonly progress: Progress
+  // extra practice ignores grades: progress never changes
+  readonly extra: boolean
+  // cards graded since the session began or last continued
+  readonly sinceStop: number
+  // cards missed since then, each listed once
+  readonly missed: ReadonlyArray<Card>
 }
 
 // the number of the study day that contains this moment; local time, with the
@@ -147,11 +159,50 @@ function interleave<T>(first: ReadonlyArray<T>, second: ReadonlyArray<T>): T[] {
   return mixed
 }
 
+// extra practice: the cards missed most recently, then the newest, from the
+// pool; empty when nothing in the pool was ever graded
+export function buildExtraQueue(
+  pool: ReadonlyArray<Card>,
+  progress: Progress,
+): Card[] {
+  return pool
+    .flatMap((card, index) => {
+      const saved = progress[card.id]
+      return saved ? [{ card, index, saved }] : []
+    })
+    .sort(
+      (x, y) =>
+        Number(x.saved.box !== 1) - Number(y.saved.box !== 1) ||
+        y.saved.introduced - x.saved.introduced ||
+        x.index - y.index,
+    )
+    .slice(0, EXTRA_PRACTICE_SIZE)
+    .map((item) => item.card)
+}
+
 export function startSession(
   cards: ReadonlyArray<Card>,
   progress: Progress = {},
+  options: { extra?: boolean } = {},
 ): Session {
-  return { queue: cards, progress }
+  return {
+    queue: cards,
+    progress,
+    extra: options.extra ?? false,
+    sinceStop: 0,
+    missed: [],
+  }
+}
+
+// true when the learner has gone through about SUMMARY_AFTER cards and more
+// are waiting; a session that has just ended shows its own done screen
+export function summaryDue(session: Session): boolean {
+  return session.sinceStop >= SUMMARY_AFTER && !isFinished(session)
+}
+
+// goes on with the same queue after the summary
+export function continueSession(session: Session): Session {
+  return { ...session, sinceStop: 0, missed: [] }
 }
 
 export function currentCard(session: Session): Card | undefined {
@@ -172,19 +223,28 @@ export function grade(session: Session, verdict: Grade, now: Date): Session {
 
   const today = studyDay(now)
   const rest = session.queue.slice(1)
+  const sinceStop = session.sinceStop + 1
+  // extra practice shows the same cards but never touches the schedule
+  const progressFor = (box: number) =>
+    session.extra
+      ? session.progress
+      : withBox(session.progress, card, box, today)
+
   if (verdict === 'knew') {
     const box = Math.min(boxOf(session, card) + 1, BOX_COUNT)
-    return {
-      queue: rest,
-      progress: withBox(session.progress, card, box, today),
-    }
+    return { ...session, queue: rest, progress: progressFor(box), sinceStop }
   }
 
   // missed: back to box 1, and shown again after a few other cards
   const gap = Math.min(MISS_RETURN_GAP, rest.length)
   return {
+    ...session,
     queue: [...rest.slice(0, gap), card, ...rest.slice(gap)],
-    progress: withBox(session.progress, card, 1, today),
+    progress: progressFor(1),
+    sinceStop,
+    missed: session.missed.includes(card)
+      ? session.missed
+      : [...session.missed, card],
   }
 }
 

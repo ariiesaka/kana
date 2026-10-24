@@ -2,13 +2,16 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { counterpart } from '#/kana/kana'
 import {
+  buildExtraQueue,
   buildQueue,
+  continueSession,
   currentCard,
   type Grade,
   grade,
   isFinished,
   poolFor,
   startSession,
+  summaryDue,
 } from '#/session/session'
 import { progressStore } from '#/storage/progress-store'
 
@@ -25,22 +28,35 @@ function Practice() {
     // from one group at a time as the earlier groups become reliable
     const pool = poolFor(progressStore.loadSettings().scripts)
     const queue = buildQueue(pool, progress, new Date())
-    return { session: startSession(queue, progress), count: queue.length }
+    return {
+      session: startSession(queue, progress),
+      count: queue.length,
+      pool,
+    }
   })
   const [session, setSession] = useState(initial.session)
   const [revealed, setRevealed] = useState(false)
   const faceRef = useRef<HTMLButtonElement>(null)
   const missedRef = useRef<HTMLButtonElement>(null)
   const homeRef = useRef<HTMLAnchorElement>(null)
+  const continueRef = useRef<HTMLButtonElement>(null)
 
   const card = currentCard(session)
   const finished = isFinished(session)
+  const summary = summaryDue(session)
+  const extraCards = buildExtraQueue(initial.pool, session.progress)
 
   const answer = useCallback((verdict: Grade) => {
     const now = new Date()
     setSession((current) => grade(current, verdict, now))
     setRevealed(false)
   }, [])
+
+  // extra practice replays recent cards and leaves the schedule alone
+  function startExtra() {
+    setSession(startSession(extraCards, session.progress, { extra: true }))
+    setRevealed(false)
+  }
 
   // save after every grade; nothing is saved until the progress has changed,
   // so unreadable saved data is not overwritten before anything is graded
@@ -68,10 +84,11 @@ function Practice() {
 
   // focus follows the flow: to the grade buttons after reveal, back to the card after grading
   useEffect(() => {
-    if (finished) homeRef.current?.focus()
+    if (summary) continueRef.current?.focus()
+    else if (finished) homeRef.current?.focus()
     else if (revealed) missedRef.current?.focus()
     else faceRef.current?.focus()
-  }, [revealed, finished])
+  }, [revealed, finished, summary])
 
   return (
     <>
@@ -89,23 +106,72 @@ function Practice() {
         </Link>
         <h1>flashcards</h1>
 
-        {!card ? (
+        {summary ? (
+          <section
+            className="practice-summary"
+            aria-labelledby="summary-heading"
+          >
+            <h2 id="summary-heading">
+              {session.missed.length === 0 ? 'no misses' : 'missed so far'}
+            </h2>
+            {session.missed.length > 0 && (
+              <ul className="summary-missed" lang="ja">
+                {session.missed.map((missed) => (
+                  <li key={missed.id}>{missed.kana}</li>
+                ))}
+              </ul>
+            )}
+            <div className="reset-actions">
+              <button
+                ref={continueRef}
+                type="button"
+                className="primary-action"
+                onClick={() => setSession(continueSession(session))}
+              >
+                continue
+              </button>
+              <Link to="/" className="secondary-action">
+                finish
+              </Link>
+            </div>
+          </section>
+        ) : !card ? (
           <section className="practice-done" aria-labelledby="done-heading">
             <h2 id="done-heading">
-              {initial.count === 0 ? 'nothing due right now' : 'done for now'}
+              {session.extra
+                ? 'extra practice done'
+                : initial.count === 0
+                  ? 'nothing due right now'
+                  : 'done for now'}
             </h2>
             <p className="intro">
-              {initial.count === 0
-                ? 'come back later for the next cards'
-                : "you went through today's cards"}
+              {session.extra
+                ? 'your schedule stayed the same'
+                : initial.count === 0
+                  ? 'come back later for the next cards'
+                  : "you went through today's cards"}
             </p>
-            <Link ref={homeRef} to="/" className="primary-action">
-              back to activities
-            </Link>
+            <div className="reset-actions">
+              <Link ref={homeRef} to="/" className="primary-action">
+                back to activities
+              </Link>
+              {extraCards.length > 0 && (
+                <button
+                  type="button"
+                  className="secondary-action"
+                  onClick={startExtra}
+                >
+                  extra practice
+                </button>
+              )}
+            </div>
           </section>
         ) : (
           <section className="flashcard" aria-label="flashcard">
-            <p className="practice-count">{session.queue.length} left</p>
+            <p className="practice-count">
+              {session.queue.length} left
+              {session.extra ? ' · extra practice, schedule unchanged' : ''}
+            </p>
             {/* always mounted so screen readers announce what appears on reveal */}
             <p className="sr-only" aria-live="polite">
               {revealed
