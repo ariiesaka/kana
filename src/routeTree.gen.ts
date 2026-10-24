@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MultipleChoiceRouteImport } from './routes/multiple-choice'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as SettingsRouteImport } from './routes/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const PracticeRoute = PracticeRouteImport.update({
   path: '/practice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
   '/practice': typeof PracticeRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
   '/practice': typeof PracticeRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
   '/practice': typeof PracticeRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/multiple-choice' | '/practice'
+  fullPaths: '/' | '/multiple-choice' | '/practice' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/multiple-choice' | '/practice'
-  id: '__root__' | '/' | '/multiple-choice' | '/practice'
+  to: '/' | '/multiple-choice' | '/practice' | '/settings'
+  id: '__root__' | '/' | '/multiple-choice' | '/practice' | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MultipleChoiceRoute: typeof MultipleChoiceRoute
   PracticeRoute: typeof PracticeRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MultipleChoiceRoute: MultipleChoiceRoute,
   PracticeRoute: PracticeRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -59,3 +59,7 @@ _Avoid_: quiz, test
 **Session**:
 One open-ended stretch of practice that the learner can leave at any point without losing progress.
 _Avoid_: round, lesson, run
+
+**Settings**:
+The learner's own choices, such as which scripts to practice, saved with their progress. Not the tunable schedule settings.
+_Avoid_: preferences, options
