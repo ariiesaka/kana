@@ -94,7 +94,7 @@ function MultipleChoiceSetup() {
         </Link>
       </header>
       <main className="home setup">
-        <Link className="setup-back" to="/">
+        <Link className="back-link" to="/">
           ← activities
         </Link>
         <h1>multiple choice</h1>

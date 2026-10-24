@@ -1,9 +1,10 @@
-.setup {
+.setup,
+.practice {
   position: relative;
   padding-bottom: var(--space-8);
 }
 
-.setup-back {
+.back-link {
   display: inline-flex;
   align-items: center;
   position: absolute;
@@ -16,7 +17,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .setup-back:hover {
+  .back-link:hover {
     color: var(--color-text);
   }
 }

@@ -5,6 +5,7 @@ const practiceModes = [
     id: 'multiple-choice',
     name: 'multiple choice',
     description: 'choose the romaji that matches each kana',
+    to: '/multiple-choice',
   },
   {
     id: 'matching',
@@ -15,8 +16,9 @@ const practiceModes = [
     id: 'flashcards',
     name: 'flashcards',
     description: 'try to recall the reading before revealing the answer',
+    to: '/practice',
   },
-]
+] as const
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -56,7 +58,8 @@ function Home() {
         </p>
 
         <p className="mode-status" id="mode-status">
-          choose your kana in multiple choice — practice is coming soon
+          flashcards are ready · multiple choice and matching practice are
+          coming soon
         </p>
         <ul
           className="mode-list"
@@ -65,8 +68,8 @@ function Home() {
         >
           {practiceModes.map((mode) => (
             <li key={mode.id}>
-              {mode.id === 'multiple-choice' ? (
-                <Link className="mode-choice mode-link" to="/multiple-choice">
+              {'to' in mode ? (
+                <Link className="mode-choice mode-link" to={mode.to}>
                   <span className="mode-name">
                     {mode.name} <span aria-hidden="true">→</span>
                   </span>
