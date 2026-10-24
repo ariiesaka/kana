@@ -4,6 +4,7 @@ import {
   BOX_COUNT,
   boxOf,
   currentCard,
+  type Grade,
   grade,
   isFinished,
   type Session,
@@ -14,7 +15,7 @@ const vowels = cardsOfGroup('vowels', 'hiragana')
 const [a, i, u, e, o] = vowels
 
 // grade the current card with each grade in turn, returning the kana shown
-function play(session: Session, grades: Array<'knew' | 'missed'>) {
+function play(session: Session, grades: Grade[]) {
   const shown: string[] = []
   let next = session
   for (const verdict of grades) {

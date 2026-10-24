@@ -58,8 +58,7 @@ function Home() {
         </p>
 
         <p className="mode-status" id="mode-status">
-          flashcards are ready · multiple choice and matching practice are
-          coming soon
+          flashcards are ready · the other formats are coming soon
         </p>
         <ul
           className="mode-list"

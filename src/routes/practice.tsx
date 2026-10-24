@@ -22,6 +22,7 @@ function Practice() {
   const [revealed, setRevealed] = useState(false)
   const faceRef = useRef<HTMLButtonElement>(null)
   const missedRef = useRef<HTMLButtonElement>(null)
+  const againRef = useRef<HTMLButtonElement>(null)
 
   const card = currentCard(session)
   const finished = isFinished(session)
@@ -50,8 +51,8 @@ function Practice() {
 
   // focus follows the flow: to the grade buttons after reveal, back to the card after grading
   useEffect(() => {
-    if (finished) return
-    if (revealed) missedRef.current?.focus()
+    if (finished) againRef.current?.focus()
+    else if (revealed) missedRef.current?.focus()
     else faceRef.current?.focus()
   }, [revealed, finished])
 
@@ -68,13 +69,14 @@ function Practice() {
         </Link>
         <h1>flashcards</h1>
 
-        {finished || !card ? (
+        {!card ? (
           <section className="practice-done" aria-labelledby="done-heading">
             <h2 id="done-heading">done for now</h2>
             <p className="intro">
               you went through all {firstCards.length} cards
             </p>
             <button
+              ref={againRef}
               type="button"
               className="primary-action"
               onClick={() => {
@@ -88,13 +90,19 @@ function Practice() {
         ) : (
           <section className="flashcard" aria-label="flashcard">
             <p className="practice-count">{session.queue.length} left</p>
+            {/* always mounted so screen readers announce what appears on reveal */}
+            <p className="sr-only" aria-live="polite">
+              {revealed
+                ? `${card.romaji}, also written ${counterpart(card).kana}`
+                : ''}
+            </p>
 
             {revealed ? (
               <div className="card-face is-revealed">
                 <span className="card-kana" lang="ja">
                   {card.kana}
                 </span>
-                <p className="card-answer" aria-live="polite">
+                <p className="card-answer">
                   <span className="answer-romaji">{card.romaji}</span>
                   <span className="answer-other">
                     <span className="sr-only">also written </span>

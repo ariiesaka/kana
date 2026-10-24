@@ -12,8 +12,8 @@ export type Progress = Readonly<Record<string, { box: number }>>
 
 export type Session = {
   // cards still to show; the first one is the current card
-  queue: ReadonlyArray<Card>
-  progress: Progress
+  readonly queue: ReadonlyArray<Card>
+  readonly progress: Progress
 }
 
 export function startSession(

@@ -20,7 +20,7 @@ Help a complete beginner become comfortable reading hiragana and katakana fluent
 
 ## Positioning
 
-Open decision: the product's specific distinguishing mechanism beyond beginner-friendly kana reading practice. Planned practice formats are multiple choice, matching, and flashcards, ordered from more guidance to recall; they are not shipped yet.
+Open decision: the product's specific distinguishing mechanism beyond beginner-friendly kana reading practice. Planned practice formats are multiple choice, matching, and flashcards, ordered from more guidance to recall; flashcards have a first session, and the other two are not shipped yet.
 
 ## Operating Context
 
@@ -30,7 +30,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 
 - Initial release is static and does not require accounts.
 - The home screen offers multiple choice, matching, and flashcards as practice-format choices, ordered from more guidance to recall.
-- Multiple choice opens a kana-led setup with hiragana, katakana, or both. Practice sessions are coming soon.
+- Flashcards open a first session on the vowels in hiragana, held in memory only. Multiple choice opens a kana-led setup with hiragana, katakana, or both; its practice is coming soon.
 - Study progress is saved in this browser only; see docs/adr/0001-local-progress-in-browser-storage.md.
 - Login, syncing across devices, and streaks are long-term ideas.
 - The home screen is designed before its practice flows.
