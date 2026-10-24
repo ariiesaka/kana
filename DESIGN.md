@@ -67,6 +67,7 @@ Text needs 4.5:1 and non-text parts of controls need 3:1.
 | `--text-xs` / `sm` / `base` / `lg` | 0.75 / 0.875 / 1 / 1.125rem | labels, secondary, body, emphasis |
 | `--text-kana` | 1.375rem | kana in running content |
 | `--text-title` | 2rem | page titles |
+| `--text-display` | clamp(4.5rem, 22vw, 6rem) | the kana on a flashcard |
 | `--weight-regular` / `bold` | 400 / 700 | the only two weights |
 
 Fonts are self-hosted. IBM Plex Sans comes from the `@fontsource/ibm-plex-sans` package (latin, 400 and 700). IBM Plex Sans JP is limited to the 8 font slices that contain hiragana and katakana (each slice also carries some unrelated glyphs), copied from `@fontsource/ibm-plex-sans-jp` 5.3.1 into `src/fonts` with its license; the license for IBM Plex Sans is in the same folder. The app makes no third-party font request. Mark kana with `lang="ja"` so they use the kana font.

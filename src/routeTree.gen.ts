@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MultipleChoiceRouteImport } from './routes/multiple-choice'
+import { Route as PracticeRouteImport } from './routes/practice'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const MultipleChoiceRoute = MultipleChoiceRouteImport.update({
   path: '/multiple-choice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PracticeRoute = PracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
+  '/practice': typeof PracticeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
+  '/practice': typeof PracticeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/multiple-choice': typeof MultipleChoiceRoute
+  '/practice': typeof PracticeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/multiple-choice'
+  fullPaths: '/' | '/multiple-choice' | '/practice'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/multiple-choice'
-  id: '__root__' | '/' | '/multiple-choice'
+  to: '/' | '/multiple-choice' | '/practice'
+  id: '__root__' | '/' | '/multiple-choice' | '/practice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MultipleChoiceRoute: typeof MultipleChoiceRoute
+  PracticeRoute: typeof PracticeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MultipleChoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/practice': {
+      id: '/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MultipleChoiceRoute: MultipleChoiceRoute,
+  PracticeRoute: PracticeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
