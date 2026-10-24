@@ -1,4 +1,5 @@
-import { type Card, cardsOfGroup } from '#/kana/kana'
+import { allCards, type Card, cardsOfGroup } from '#/kana/kana'
+import type { ScriptChoice } from '#/settings/settings'
 
 export type Grade = 'knew' | 'missed'
 
@@ -97,9 +98,19 @@ export function isGroupReliable(
   return reliable / cards.length >= RELIABLE_SHARE
 }
 
-// new cards come from the earliest group that still has cards never graded,
-// and the next group only opens once the one before it is reliable; groups
-// follow the order of the pool, so the pool is one script in learning order
+// the cards a script choice offers, in learning order: all of hiragana, then
+// all of katakana when both are on
+export function poolFor(scripts: ScriptChoice): Card[] {
+  return scripts === 'both'
+    ? [...allCards('hiragana'), ...allCards('katakana')]
+    : allCards('hiragana')
+}
+
+// new cards come from the earliest group that still has cards never graded.
+// hiragana opens group by group: the next group once the one before it is
+// reliable. a group's katakana opens once that group's own hiragana is
+// reliable. groups follow the order of the pool, and within a group hiragana
+// comes before katakana because the pool lists hiragana first
 function pickNewCards(
   pool: ReadonlyArray<Card>,
   progress: Progress,
@@ -107,15 +118,19 @@ function pickNewCards(
 ): Card[] {
   const picked: Card[] = []
   const groupIds = [...new Set(pool.map((card) => card.groupId))]
+  let hiraganaOpen = true
   for (const groupId of groupIds) {
     if (picked.length >= room) break
-    const inPool = pool.filter((card) => card.groupId === groupId)
-    for (const card of inPool) {
-      if (!progress[card.id] && picked.length < room) picked.push(card)
+    const hiraganaReliable = isGroupReliable(
+      cardsOfGroup(groupId, 'hiragana'),
+      progress,
+    )
+    for (const card of pool) {
+      if (card.groupId !== groupId || progress[card.id]) continue
+      const open = card.script === 'hiragana' ? hiraganaOpen : hiraganaReliable
+      if (open && picked.length < room) picked.push(card)
     }
-    // reliability looks at the whole group, not only its part of the pool
-    const whole = cardsOfGroup(groupId, inPool[0].script)
-    if (!isGroupReliable(whole, progress)) break
+    hiraganaOpen = hiraganaReliable
   }
   return picked
 }
