@@ -1,0 +1,68 @@
+/*
+  design tokens for kana. screens read these and never use color literals.
+  the look follows ariiesaka.dev: neutral near-black ground, off-white text,
+  IBM Plex Sans, a quiet column, muted underlines. see DESIGN.md.
+*/
+:root {
+  color-scheme: dark;
+
+  /* color: ground and text */
+  --color-bg: #111111;
+  --color-surface-selected: #242424;
+  --color-text: #f5f5f5;
+  --color-text-muted: #a3a3a3;
+
+  /* color: lines. decorative dividers are quiet; control lines mark controls */
+  --color-line: #2e2e2e;
+  --color-control-line: #7a7a7a;
+  --color-link-underline: #888888;
+
+  /* color: feedback. always paired with a text label, never color alone */
+  --color-knew: #8fd6a5;
+  --color-missed: #f0a783;
+  --color-attention: var(--color-missed);
+
+  /* type */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-kana: "IBM Plex Sans JP", "IBM Plex Sans", system-ui, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-kana: 1.375rem;
+  --text-title: 2rem;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --tracking-tight: -0.035em;
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-body: 1.6;
+
+  /* space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* layout and shape */
+  --measure: 65ch;
+  --gutter: var(--space-4);
+  --target: 44px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  /* focus and motion */
+  --focus-ring: 2px solid var(--color-text);
+  --focus-offset: 0.2em;
+  --duration-fast: 120ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+  }
+}

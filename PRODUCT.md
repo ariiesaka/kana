@@ -40,6 +40,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 - Product name: Kana.
 - The user prefers dark mode as the default theme.
 - Use the Quiet Reader direction: a minimalist, compact, text-led activity list.
+- Share the look of the personal site, ariiesaka.dev: neutral near-black ground, off-white text, and IBM Plex Sans. This replaces the earlier green-tinted palette and serif headlines; see DESIGN.md.
 - Keep visible interface copy lowercase and omit sentence-ending periods.
 - Use the lowercase k favicon.
 
