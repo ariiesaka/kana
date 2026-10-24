@@ -88,6 +88,10 @@ function MultipleChoiceSetup() {
   const showKatakana = script !== 'hiragana'
   const hiraganaPreview = previewCharacters(selectedGroups.map((group) => group.hira).join(''))
   const katakanaPreview = previewCharacters(selectedGroups.map((group) => group.kata).join(''))
+  const previewRows = [
+    { name: 'hiragana', visible: showHiragana, characters: hiraganaPreview },
+    { name: 'katakana', visible: showKatakana, characters: katakanaPreview },
+  ].filter((row) => row.visible)
 
   function toggleGroup(id: string, checked: boolean) {
     setSelectedIds((current) => {
@@ -180,18 +184,12 @@ function MultipleChoiceSetup() {
 
           <div className={`selected-preview${script === 'both' ? ' is-both' : ''}`}>
             <p className="selected-preview-label">selected kana</p>
-            {showHiragana && (
-              <div className="preview-row">
-                {script === 'both' && <span className="preview-script">hiragana</span>}
-                <p className="selected-kana" lang="ja">{hiraganaPreview || '—'}</p>
+            {previewRows.map((row) => (
+              <div className="preview-row" key={row.name}>
+                {script === 'both' && <span className="preview-script">{row.name}</span>}
+                <p className="selected-kana" lang="ja">{row.characters || '—'}</p>
               </div>
-            )}
-            {showKatakana && (
-              <div className="preview-row">
-                {script === 'both' && <span className="preview-script">katakana</span>}
-                <p className="selected-kana" lang="ja">{katakanaPreview || '—'}</p>
-              </div>
-            )}
+            ))}
             <p
               className="selection-status"
               aria-live="polite"
@@ -204,9 +202,7 @@ function MultipleChoiceSetup() {
 
         <div className="session-footer">
           <div className="session-details">
-            {selectedGroups.length > 0 && (
-              <p className="session-summary">five answer choices in romaji</p>
-            )}
+            <p className="session-summary">five answer choices in romaji</p>
             <p className="romaji-note">romaji shows kana sounds with roman letters</p>
           </div>
           <button className="preview-start" type="button" disabled>
