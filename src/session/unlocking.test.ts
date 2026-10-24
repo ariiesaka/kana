@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { allCards, type Card, cardsOfGroup, groups } from '#/kana/kana'
 import {
   buildQueue,
+  type CardProgress,
   isGroupReliable,
   type Progress,
   RELIABLE_BOX,
@@ -11,6 +12,7 @@ import {
 const pool = allCards('hiragana')
 const NOW = new Date(2026, 9, 26, 10, 0)
 const TODAY = studyDay(NOW)
+const LATER = TODAY + 30
 
 const kanaOf = (cards: ReadonlyArray<{ kana: string }>) =>
   cards.map((card) => card.kana).join('')
@@ -18,50 +20,57 @@ const kanaOf = (cards: ReadonlyArray<{ kana: string }>) =>
 const groupCards = (index: number): Card[] =>
   cardsOfGroup(groups[index].id, 'hiragana')
 
-// progress for cards that were introduced earlier and are in a box
-const inBox = (cards: ReadonlyArray<Card>, box: number, due = TODAY + 30) =>
-  Object.fromEntries(
-    cards.map((card) => [card.id, { box, due, introduced: TODAY - 9 }]),
-  ) as Progress
+// progress for cards that were introduced earlier and sit in a box
+function inBox(
+  cards: ReadonlyArray<Card>,
+  box: number,
+  due = LATER,
+  introduced = TODAY - 9,
+): Progress {
+  const entries: Array<[string, CardProgress]> = cards.map((card) => [
+    card.id,
+    { box, due, introduced },
+  ])
+  return Object.fromEntries(entries)
+}
 
 const merge = (...parts: Progress[]): Progress => Object.assign({}, ...parts)
 
-// every group before `count` is reliable and not due today
-const reliableGroups = (count: number): Progress =>
-  merge(
-    ...groups
-      .slice(0, count)
-      .map((_, index) => inBox(groupCards(index), RELIABLE_BOX)),
+// the first `count` cards are reliable, the rest of the group is in box 1
+function withReliableCount(cards: ReadonlyArray<Card>, count: number) {
+  return merge(
+    inBox(cards.slice(0, count), RELIABLE_BOX),
+    inBox(cards.slice(count), 1),
   )
+}
+
+// every group before `count` is reliable and not due today
+function reliableGroups(count: number): Progress {
+  const parts: Progress[] = []
+  for (let index = 0; index < count; index++) {
+    parts.push(inBox(groupCards(index), RELIABLE_BOX))
+  }
+  return merge(...parts)
+}
 
 describe('when a group is reliable', () => {
-  test('a card is reliable from box 3 up, so box 2 is not enough', () => {
+  test('a card must be in a high enough box, so one box below is not enough', () => {
     const vowels = groupCards(0)
     expect(isGroupReliable(vowels, inBox(vowels, RELIABLE_BOX - 1))).toBe(false)
     expect(isGroupReliable(vowels, inBox(vowels, RELIABLE_BOX))).toBe(true)
-    expect(isGroupReliable(vowels, inBox(vowels, 4))).toBe(true)
+    expect(isGroupReliable(vowels, inBox(vowels, RELIABLE_BOX + 1))).toBe(true)
   })
 
   test('4 of 5 cards (80%) is reliable and 3 of 5 is not', () => {
     const vowels = groupCards(0)
-    const reliable = (count: number) =>
-      merge(
-        inBox(vowels.slice(0, count), RELIABLE_BOX),
-        inBox(vowels.slice(count), 1),
-      )
-    expect(isGroupReliable(vowels, reliable(4))).toBe(true)
-    expect(isGroupReliable(vowels, reliable(3))).toBe(false)
+    expect(isGroupReliable(vowels, withReliableCount(vowels, 4))).toBe(true)
+    expect(isGroupReliable(vowels, withReliableCount(vowels, 3))).toBe(false)
   })
 
   test('in a group of 3, two reliable cards are not enough', () => {
     const wGroup = groupCards(9)
-    const reliable = (count: number) =>
-      merge(
-        inBox(wGroup.slice(0, count), RELIABLE_BOX),
-        inBox(wGroup.slice(count), 1),
-      )
-    expect(isGroupReliable(wGroup, reliable(2))).toBe(false)
-    expect(isGroupReliable(wGroup, reliable(3))).toBe(true)
+    expect(isGroupReliable(wGroup, withReliableCount(wGroup, 2))).toBe(false)
+    expect(isGroupReliable(wGroup, withReliableCount(wGroup, 3))).toBe(true)
   })
 
   test('cards that were never graded count as not reliable', () => {
@@ -77,40 +86,34 @@ describe('which group supplies new cards', () => {
   })
 
   test('the next group stays locked while the vowels are not reliable', () => {
-    const vowels = groupCards(0)
-    const progress = inBox(vowels, 2, TODAY)
-    const queue = buildQueue(pool, progress, NOW)
-    expect(kanaOf(queue)).toBe('あいうえお')
+    // all five vowels were graded and none is due, but they are in box 2
+    const progress = inBox(groupCards(0), RELIABLE_BOX - 1)
+    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('')
   })
 
   test('the next group unlocks as soon as the vowels reach 80%', () => {
     const vowels = groupCards(0)
-    const progress = merge(
-      inBox(vowels.slice(0, 3), RELIABLE_BOX),
-      inBox(vowels.slice(3), 1, TODAY + 30),
+    expect(kanaOf(buildQueue(pool, withReliableCount(vowels, 3), NOW))).toBe('')
+    expect(kanaOf(buildQueue(pool, withReliableCount(vowels, 4), NOW))).toBe(
+      'かきくけこ',
     )
-    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('')
-
-    const reliable = merge(
-      inBox(vowels.slice(0, 4), RELIABLE_BOX),
-      inBox(vowels.slice(4), 1, TODAY + 30),
-    )
-    expect(kanaOf(buildQueue(pool, reliable, NOW))).toBe('かきくけこ')
   })
 
-  test('each group unlocks the next, in the full learning order', () => {
-    for (let index = 0; index < groups.length - 1; index++) {
-      const queue = buildQueue(pool, reliableGroups(index + 1), NOW)
-      expect(kanaOf(queue)).toBe(kanaOf(groupCards(index + 1)).slice(0, 5))
-    }
-  })
+  test.each(
+    groups.slice(1).map((group, index) => ({ group, previous: index + 1 })),
+  )(
+    'the $group.name opens once the group before it is reliable',
+    ({ group, previous }) => {
+      const queue = buildQueue(pool, reliableGroups(previous), NOW)
+      expect(kanaOf(queue)).toBe(
+        kanaOf(cardsOfGroup(group.id, 'hiragana')).slice(0, 5),
+      )
+    },
+  )
 
   test('the w group is the last to unlock', () => {
     expect(kanaOf(buildQueue(pool, reliableGroups(9), NOW))).toBe('わをん')
-    const beforeW = merge(
-      reliableGroups(8),
-      inBox(groupCards(8), 1, TODAY + 30),
-    )
+    const beforeW = merge(reliableGroups(8), inBox(groupCards(8), 1))
     expect(kanaOf(buildQueue(pool, beforeW, NOW))).toBe('')
   })
 
@@ -119,15 +122,22 @@ describe('which group supplies new cards', () => {
   })
 
   test('a card of the current group that was never graded comes first', () => {
-    const vowels = groupCards(0)
-    const progress = inBox(vowels.slice(0, 4), RELIABLE_BOX)
+    const progress = inBox(groupCards(0).slice(0, 4), RELIABLE_BOX)
     // 4 of 5 is reliable, so お comes first and the k group fills the rest
     expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('おかきくけ')
   })
 
+  test('the daily cap counts cards introduced today, whichever group they are in', () => {
+    const progress = merge(
+      reliableGroups(1),
+      inBox(groupCards(1).slice(0, 3), 1, LATER, TODAY),
+    )
+    // three k cards started today leave room for two more
+    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('けこ')
+  })
+
   test('new cards still stop at the daily cap when a group unlocks', () => {
-    const queue = buildQueue(pool, reliableGroups(1), NOW)
-    expect(queue).toHaveLength(5)
+    expect(buildQueue(pool, reliableGroups(1), NOW)).toHaveLength(5)
   })
 })
 
@@ -139,9 +149,8 @@ describe('reliability never removes cards from review', () => {
       // あ keeps being missed: box 1, due today
       inBox(vowels.slice(0, 1), 1, TODAY),
     )
-    const queue = buildQueue(pool, progress, NOW)
-    // the vowels are reliable (4 of 5), so the review of あ is mixed with the k group
-    expect(kanaOf(queue)).toBe('あかきくけこ')
+    // the vowels are reliable (4 of 5), so the review of あ mixes with the k group
+    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('あかきくけこ')
   })
 
   test('reviews of earlier groups continue after later groups unlock', () => {
@@ -149,10 +158,20 @@ describe('reliability never removes cards from review', () => {
       reliableGroups(2),
       inBox(groupCards(0).slice(0, 2), RELIABLE_BOX, TODAY),
     )
-    const queue = buildQueue(pool, progress, NOW)
-    expect(kanaOf(queue).startsWith('あ')).toBe(true)
-    expect(kanaOf(queue)).toContain('い')
-    // two reviews, and new cards from the s group
-    expect(queue).toHaveLength(7)
+    // reviews あ い, mixed with the five new cards of the s group
+    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('あさいしすせそ')
+  })
+
+  test('when a group slips below reliable, its next group stops supplying new cards but keeps its reviews', () => {
+    const vowels = groupCards(0)
+    const kGroup = groupCards(1)
+    const progress = merge(
+      // two vowels fell back to box 1, so the vowels are no longer reliable
+      withReliableCount(vowels, 3),
+      // the k group was already introduced; か is due today
+      inBox(kGroup, 2),
+      inBox(kGroup.slice(0, 1), 2, TODAY),
+    )
+    expect(kanaOf(buildQueue(pool, progress, NOW))).toBe('か')
   })
 })

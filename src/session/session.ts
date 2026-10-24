@@ -22,7 +22,7 @@ const DAY_STARTS_AT_HOUR = 4
 export const RELIABLE_BOX = 3
 
 // a group is reliable when at least this share of its cards are; tunable
-export const RELIABLE_SHARE = 0.8
+const RELIABLE_SHARE = 0.8
 
 export type CardProgress = {
   readonly box: number
@@ -84,8 +84,8 @@ export function buildQueue(
   return interleave(reviews, newCards)
 }
 
-// a group is reliable when enough of its cards, graded or not, sit in a high
-// enough box; never graded cards count as not reliable
+// a group is reliable when enough of its cards sit in a high enough box; a
+// card that was never graded counts as not reliable
 export function isGroupReliable(
   cards: ReadonlyArray<Card>,
   progress: Progress,
@@ -107,14 +107,15 @@ function pickNewCards(
 ): Card[] {
   const picked: Card[] = []
   const groupIds = [...new Set(pool.map((card) => card.groupId))]
-  let open = true
   for (const groupId of groupIds) {
-    if (!open || picked.length >= room) break
+    if (picked.length >= room) break
     const inPool = pool.filter((card) => card.groupId === groupId)
     for (const card of inPool) {
       if (!progress[card.id] && picked.length < room) picked.push(card)
     }
-    open = isGroupReliable(cardsOfGroup(groupId, inPool[0].script), progress)
+    // reliability looks at the whole group, not only its part of the pool
+    const whole = cardsOfGroup(groupId, inPool[0].script)
+    if (!isGroupReliable(whole, progress)) break
   }
   return picked
 }

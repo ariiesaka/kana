@@ -6,6 +6,7 @@ import {
   grade,
   NEW_CARDS_PER_DAY,
   type Progress,
+  RELIABLE_BOX,
   startSession,
   studyDay,
 } from './session'
@@ -165,7 +166,7 @@ describe('building a session', () => {
     const reliable: Progress = Object.fromEntries(
       Object.entries(session.progress).map(([id, saved]) => [
         id,
-        { ...saved, box: 3 },
+        { ...saved, box: RELIABLE_BOX },
       ]),
     )
     expect(kanaOf(buildQueue(pool, reliable, at(27, 3, 59)))).toBe('')
@@ -180,11 +181,11 @@ describe('building a session', () => {
     const today = studyDay(now)
     // all five vowels are reliable, three of them are due today
     const progress: Progress = {
-      [a.id]: { box: 3, due: today, introduced: today - 9 },
-      [i.id]: { box: 3, due: today, introduced: today - 9 },
-      [u.id]: { box: 3, due: today, introduced: today - 9 },
-      [e.id]: { box: 3, due: today + 3, introduced: today - 9 },
-      [o.id]: { box: 3, due: today + 3, introduced: today - 9 },
+      [a.id]: { box: RELIABLE_BOX, due: today, introduced: today - 9 },
+      [i.id]: { box: RELIABLE_BOX, due: today, introduced: today - 9 },
+      [u.id]: { box: RELIABLE_BOX, due: today, introduced: today - 9 },
+      [e.id]: { box: RELIABLE_BOX, due: today + 3, introduced: today - 9 },
+      [o.id]: { box: RELIABLE_BOX, due: today + 3, introduced: today - 9 },
     }
     const queue = buildQueue(pool, progress, now)
     // reviews あ い う and new か き く け こ alternate while both last
