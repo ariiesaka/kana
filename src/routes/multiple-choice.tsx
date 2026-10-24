@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 type Script = 'hiragana' | 'katakana' | 'both'
@@ -7,6 +7,7 @@ type GroupCategory = 'basic' | 'sound-marked'
 type KanaGroup = {
   id: string
   name: string
+  romaji: string
   hira: string
   kata: string
   category: GroupCategory
@@ -20,31 +21,32 @@ const scripts: Array<{
 }> = [
   { id: 'hiragana', name: 'hiragana', example: 'あ', description: 'rounded' },
   { id: 'katakana', name: 'katakana', example: 'ア', description: 'angular' },
-  { id: 'both', name: 'both', example: 'あ ア', description: 'both scripts' },
+  { id: 'both', name: 'both', example: 'あ ア', description: 'one script per question' },
 ]
 
 const groups: KanaGroup[] = [
-  { id: 'vowels', name: 'vowels + n', hira: 'あいうえおん', kata: 'アイウエオン', category: 'basic' },
-  { id: 'k', name: 'k-row', hira: 'かきくけこ', kata: 'カキクケコ', category: 'basic' },
-  { id: 's', name: 's-row', hira: 'さしすせそ', kata: 'サシスセソ', category: 'basic' },
-  { id: 't', name: 't-row', hira: 'たちつてと', kata: 'タチツテト', category: 'basic' },
-  { id: 'n', name: 'n-row', hira: 'なにぬねの', kata: 'ナニヌネノ', category: 'basic' },
-  { id: 'h', name: 'h-row', hira: 'はひふへほ', kata: 'ハヒフヘホ', category: 'basic' },
-  { id: 'm', name: 'm-row', hira: 'まみむめも', kata: 'マミムメモ', category: 'basic' },
-  { id: 'y', name: 'y-row', hira: 'やゆよ', kata: 'ヤユヨ', category: 'basic' },
-  { id: 'r', name: 'r-row', hira: 'らりるれろ', kata: 'ラリルレロ', category: 'basic' },
-  { id: 'w', name: 'w-row', hira: 'わを', kata: 'ワヲ', category: 'basic' },
-  { id: 'g', name: 'g-row', hira: 'がぎぐげご', kata: 'ガギグゲゴ', category: 'sound-marked' },
-  { id: 'z', name: 'z-row', hira: 'ざじずぜぞ', kata: 'ザジズゼゾ', category: 'sound-marked' },
-  { id: 'd', name: 'd-row', hira: 'だぢづでど', kata: 'ダヂヅデド', category: 'sound-marked' },
-  { id: 'b', name: 'b-row', hira: 'ばびぶべぼ', kata: 'バビブベボ', category: 'sound-marked' },
-  { id: 'p', name: 'p-row', hira: 'ぱぴぷぺぽ', kata: 'パピプペポ', category: 'sound-marked' },
+  { id: 'vowels', name: 'vowels + n', romaji: 'a i u e o n', hira: 'あいうえおん', kata: 'アイウエオン', category: 'basic' },
+  { id: 'k', name: 'k group', romaji: 'ka ki ku ke ko', hira: 'かきくけこ', kata: 'カキクケコ', category: 'basic' },
+  { id: 's', name: 's group', romaji: 'sa shi su se so', hira: 'さしすせそ', kata: 'サシスセソ', category: 'basic' },
+  { id: 't', name: 't group', romaji: 'ta chi tsu te to', hira: 'たちつてと', kata: 'タチツテト', category: 'basic' },
+  { id: 'n', name: 'n group', romaji: 'na ni nu ne no', hira: 'なにぬねの', kata: 'ナニヌネノ', category: 'basic' },
+  { id: 'h', name: 'h group', romaji: 'ha hi fu he ho', hira: 'はひふへほ', kata: 'ハヒフヘホ', category: 'basic' },
+  { id: 'm', name: 'm group', romaji: 'ma mi mu me mo', hira: 'まみむめも', kata: 'マミムメモ', category: 'basic' },
+  { id: 'y', name: 'y group', romaji: 'ya yu yo', hira: 'やゆよ', kata: 'ヤユヨ', category: 'basic' },
+  { id: 'r', name: 'r group', romaji: 'ra ri ru re ro', hira: 'らりるれろ', kata: 'ラリルレロ', category: 'basic' },
+  { id: 'w', name: 'w group', romaji: 'wa wo', hira: 'わを', kata: 'ワヲ', category: 'basic' },
+  { id: 'g', name: 'g group', romaji: 'ga gi gu ge go', hira: 'がぎぐげご', kata: 'ガギグゲゴ', category: 'sound-marked' },
+  { id: 'z', name: 'z group', romaji: 'za ji zu ze zo', hira: 'ざじずぜぞ', kata: 'ザジズゼゾ', category: 'sound-marked' },
+  { id: 'd', name: 'd group', romaji: 'da ji zu de do', hira: 'だぢづでど', kata: 'ダヂヅデド', category: 'sound-marked' },
+  { id: 'b', name: 'b group', romaji: 'ba bi bu be bo', hira: 'ばびぶべぼ', kata: 'バビブベボ', category: 'sound-marked' },
+  { id: 'p', name: 'p group', romaji: 'pa pi pu pe po', hira: 'ぱぴぷぺぽ', kata: 'パピプペポ', category: 'sound-marked' },
 ]
 
 const groupCategoryNames: Record<GroupCategory, string> = {
-  basic: 'basic kana',
-  'sound-marked': 'sound-marked kana',
+  basic: 'kana without marks',
+  'sound-marked': 'kana with marks',
 }
+const groupCategories = Array.from(new Set(groups.map((group) => group.category)))
 
 export const Route = createFileRoute('/multiple-choice')({
   head: () => ({ meta: [{ title: 'multiple choice · kana' }] }),
@@ -104,7 +106,7 @@ function MultipleChoiceSetup() {
       <main className="home setup">
         <Link className="setup-back" to="/">← activities</Link>
         <h1>multiple choice</h1>
-        <p className="intro" id="practice-status">setup preview · practice is coming soon</p>
+        <p className="intro">choose a script and one or more groups</p>
 
         <fieldset className="script-fieldset">
           <legend>kana to practice</legend>
@@ -129,8 +131,8 @@ function MultipleChoiceSetup() {
 
         <section className="groups-section" aria-labelledby="groups-heading">
           <h2 id="groups-heading">groups to practice</h2>
+          <p className="group-guidance">start with vowels + n · other groups share a starting sound</p>
           <div className="compact-toolbar">
-            <span>choose one or more</span>
             <div className="compact-actions">
               <button
                 type="button"
@@ -145,36 +147,39 @@ function MultipleChoiceSetup() {
           <fieldset className="compact-fieldset">
             <legend className="sr-only">kana groups</legend>
             <div className="compact-groups">
-              {groups.map((group, index) => (
-                <Fragment key={group.id}>
-                  {(index === 0 || groups[index - 1].category !== group.category) && (
-                    <div className={`group-divider${group.category === 'basic' ? ' basic-divider' : ''}`}>
-                      <span className="group-category-label">{groupCategoryNames[group.category]}</span>
-                      {group.category === 'sound-marked' && (
-                        <span className="voiced-help">small marks · か→が は→ぱ</span>
-                      )}
-                    </div>
-                  )}
-                  <label className="group-toggle">
-                    <input
-                      type="checkbox"
-                      name="groups"
-                      value={group.id}
-                      aria-label={`${group.name}: ${groupSample(group, script)}`}
-                      checked={selectedIds.has(group.id)}
-                      onChange={(event) => toggleGroup(group.id, event.target.checked)}
-                    />
-                    <span className="group-name">
-                      {group.id === 'vowels' ? group.name : `${group.id}-row`}
-                    </span>
-                    <span className="group-sample" lang="ja">{groupSample(group, script)}</span>
-                  </label>
-                </Fragment>
+              {groupCategories.map((category) => (
+                <fieldset className="group-category" key={category}>
+                  <legend className="group-divider" data-category={category}>
+                    <span className="group-category-label">{groupCategoryNames[category]}</span>
+                    {category === 'sound-marked' && (
+                      <span className="sound-marked-help">marks change sounds · ka → ga · ha → pa</span>
+                    )}
+                  </legend>
+                  <div className="group-options">
+                    {groups
+                      .filter((group) => group.category === category)
+                      .map((group) => (
+                        <label className="group-toggle" key={group.id}>
+                          <input
+                            type="checkbox"
+                            name="groups"
+                            value={group.id}
+                            checked={selectedIds.has(group.id)}
+                            onChange={(event) => toggleGroup(group.id, event.target.checked)}
+                          />
+                          <span className="group-name">{group.name}</span>
+                          <span className="group-sample" lang="ja">{groupSample(group, script)}</span>
+                          <span className="group-romaji">{group.romaji}</span>
+                        </label>
+                      ))}
+                  </div>
+                </fieldset>
               ))}
             </div>
           </fieldset>
 
           <div className={`selected-preview${script === 'both' ? ' is-both' : ''}`}>
+            <p className="selected-preview-label">selected kana</p>
             {showHiragana && (
               <div className="preview-row">
                 {script === 'both' && <span className="preview-script">hiragana</span>}
@@ -199,10 +204,12 @@ function MultipleChoiceSetup() {
 
         <div className="session-footer">
           <div className="session-details">
-            <p className="session-summary">{kanaCount} kana · five romaji choices</p>
+            {selectedGroups.length > 0 && (
+              <p className="session-summary">five answer choices in romaji</p>
+            )}
             <p className="romaji-note">romaji shows kana sounds with roman letters</p>
           </div>
-          <button className="preview-start" type="button" disabled aria-describedby="practice-status">
+          <button className="preview-start" type="button" disabled>
             practice coming soon
           </button>
         </div>
