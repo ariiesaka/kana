@@ -37,4 +37,4 @@ React, TanStack Router, TypeScript, Vite, and Bun. the decisions behind this sta
 
 ## design
 
-the interface defaults to dark mode and keeps the study choices in a compact, text-led list. visible copy stays lowercase.
+the interface defaults to dark mode and keeps the study choices in a compact, text-led list. visible copy stays lowercase. the colors, type, and spacing are design tokens described in [DESIGN.md](DESIGN.md).
