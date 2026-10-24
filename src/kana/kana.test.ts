@@ -5,7 +5,7 @@ const kanaOf = (cards: ReadonlyArray<{ kana: string }>) =>
   cards.map((card) => card.kana).join('')
 
 describe('learning order', () => {
-  test('lists the ten plain groups in the order they are introduced', () => {
+  test('lists the ten groups in the order they are introduced', () => {
     expect(groups.map((group) => group.id)).toEqual([
       'vowels',
       'k',
@@ -51,15 +51,32 @@ describe('group contents', () => {
     }
   })
 
-  test('cards come back in learning order', () => {
-    expect(
-      kanaOf(allCards('hiragana')).startsWith('あいうえおかきくけこ'),
-    ).toBe(true)
-    expect(kanaOf(allCards('hiragana')).endsWith('わをん')).toBe(true)
+  test('hiragana cards come back in learning order', () => {
+    expect(kanaOf(allCards('hiragana'))).toBe(
+      'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん',
+    )
+  })
+
+  test('katakana cards come back in the same learning order', () => {
+    expect(kanaOf(allCards('katakana'))).toBe(
+      'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン',
+    )
   })
 })
 
 describe('romaji', () => {
+  test('reads every kana in learning order, the same in both scripts', () => {
+    const sequence =
+      'a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n'
+    for (const script of ['hiragana', 'katakana'] as const) {
+      expect(
+        allCards(script)
+          .map((card) => card.romaji)
+          .join(' '),
+      ).toBe(sequence)
+    }
+  })
+
   test('uses the common reading for the irregular kana', () => {
     const romajiOf = (script: 'hiragana' | 'katakana', kana: string) =>
       allCards(script).find((card) => card.kana === kana)?.romaji

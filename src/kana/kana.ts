@@ -27,7 +27,7 @@ export type Card = {
 }
 
 // one entry per kana: hiragana, katakana, romaji
-const row = (...entries: Array<[string, string, string]>) =>
+const kanaList = (...entries: Array<[string, string, string]>) =>
   entries.map(([hiragana, katakana, romaji]) => ({
     hiragana,
     katakana,
@@ -39,7 +39,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'vowels',
     name: 'vowels',
-    kana: row(
+    kana: kanaList(
       ['あ', 'ア', 'a'],
       ['い', 'イ', 'i'],
       ['う', 'ウ', 'u'],
@@ -50,7 +50,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'k',
     name: 'k group',
-    kana: row(
+    kana: kanaList(
       ['か', 'カ', 'ka'],
       ['き', 'キ', 'ki'],
       ['く', 'ク', 'ku'],
@@ -61,7 +61,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 's',
     name: 's group',
-    kana: row(
+    kana: kanaList(
       ['さ', 'サ', 'sa'],
       ['し', 'シ', 'shi'],
       ['す', 'ス', 'su'],
@@ -72,7 +72,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 't',
     name: 't group',
-    kana: row(
+    kana: kanaList(
       ['た', 'タ', 'ta'],
       ['ち', 'チ', 'chi'],
       ['つ', 'ツ', 'tsu'],
@@ -83,7 +83,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'n',
     name: 'n group',
-    kana: row(
+    kana: kanaList(
       ['な', 'ナ', 'na'],
       ['に', 'ニ', 'ni'],
       ['ぬ', 'ヌ', 'nu'],
@@ -94,7 +94,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'h',
     name: 'h group',
-    kana: row(
+    kana: kanaList(
       ['は', 'ハ', 'ha'],
       ['ひ', 'ヒ', 'hi'],
       ['ふ', 'フ', 'fu'],
@@ -105,7 +105,7 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'm',
     name: 'm group',
-    kana: row(
+    kana: kanaList(
       ['ま', 'マ', 'ma'],
       ['み', 'ミ', 'mi'],
       ['む', 'ム', 'mu'],
@@ -116,12 +116,12 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'y',
     name: 'y group',
-    kana: row(['や', 'ヤ', 'ya'], ['ゆ', 'ユ', 'yu'], ['よ', 'ヨ', 'yo']),
+    kana: kanaList(['や', 'ヤ', 'ya'], ['ゆ', 'ユ', 'yu'], ['よ', 'ヨ', 'yo']),
   },
   {
     id: 'r',
     name: 'r group',
-    kana: row(
+    kana: kanaList(
       ['ら', 'ラ', 'ra'],
       ['り', 'リ', 'ri'],
       ['る', 'ル', 'ru'],
@@ -132,9 +132,13 @@ export const groups: ReadonlyArray<Group> = [
   {
     id: 'w',
     name: 'w group',
-    kana: row(['わ', 'ワ', 'wa'], ['を', 'ヲ', 'wo'], ['ん', 'ン', 'n']),
+    kana: kanaList(['わ', 'ワ', 'wa'], ['を', 'ヲ', 'wo'], ['ん', 'ン', 'n']),
   },
 ]
+
+function otherScript(script: Script): Script {
+  return script === 'hiragana' ? 'katakana' : 'hiragana'
+}
 
 const cardId = (script: Script, kana: string) => `${script}:${kana}`
 
@@ -173,12 +177,13 @@ export function getCard(id: string): Card | undefined {
 export function counterpart(card: Card): Card {
   const group = groups.find((item) => item.id === card.groupId)
   const entry = group?.kana.find((item) => item[card.script] === card.kana)
-  if (!group || !entry) throw new Error(`unknown card ${card.id}`)
-  return cardsFor(group, otherScript(card.script)).find(
-    (item) => item.romaji === entry.romaji,
-  ) as Card
-}
-
-function otherScript(script: Script): Script {
-  return script === 'hiragana' ? 'katakana' : 'hiragana'
+  if (!entry) throw new Error(`unknown card ${card.id}`)
+  const script = otherScript(card.script)
+  return {
+    id: cardId(script, entry[script]),
+    kana: entry[script],
+    script,
+    romaji: entry.romaji,
+    groupId: card.groupId,
+  }
 }
