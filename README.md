@@ -29,7 +29,7 @@ the dev and preview servers both use port 3000 and exit if it is already occupie
 
 ## deploy
 
-kana deploys to cloudflare as static files. use `bun install` as the install command and `bun run build` as the build command, and set `BUN_VERSION` to the version pinned in [package.json](package.json), because cloudflare's default bun is older.
+kana deploys to cloudflare as static files. use `bun install` as the install command and `bun run build` as the build command, publish the `dist` folder, and set `BUN_VERSION` to the version pinned in [package.json](package.json), because cloudflare's default bun is older. the app is client-only, so unknown paths must serve `index.html`; cloudflare pages does this when the project has no `404.html`.
 
 ## stack
 
