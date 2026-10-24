@@ -1,20 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
+import { type Group, groups } from '#/kana/kana'
 
-type Script = 'hiragana' | 'katakana' | 'both'
-type GroupCategory = 'basic' | 'sound-marked'
-
-type KanaGroup = {
-  id: string
-  name: string
-  romaji: string
-  hira: string
-  kata: string
-  category: GroupCategory
-}
+type ScriptChoice = 'hiragana' | 'katakana' | 'both'
 
 const scripts: Array<{
-  id: Script
+  id: ScriptChoice
   name: string
   example: string
   description: string
@@ -29,137 +20,6 @@ const scripts: Array<{
   },
 ]
 
-const groups: KanaGroup[] = [
-  {
-    id: 'vowels',
-    name: 'vowels + n',
-    romaji: 'a i u e o n',
-    hira: 'あいうえおん',
-    kata: 'アイウエオン',
-    category: 'basic',
-  },
-  {
-    id: 'k',
-    name: 'k group',
-    romaji: 'ka ki ku ke ko',
-    hira: 'かきくけこ',
-    kata: 'カキクケコ',
-    category: 'basic',
-  },
-  {
-    id: 's',
-    name: 's group',
-    romaji: 'sa shi su se so',
-    hira: 'さしすせそ',
-    kata: 'サシスセソ',
-    category: 'basic',
-  },
-  {
-    id: 't',
-    name: 't group',
-    romaji: 'ta chi tsu te to',
-    hira: 'たちつてと',
-    kata: 'タチツテト',
-    category: 'basic',
-  },
-  {
-    id: 'n',
-    name: 'n group',
-    romaji: 'na ni nu ne no',
-    hira: 'なにぬねの',
-    kata: 'ナニヌネノ',
-    category: 'basic',
-  },
-  {
-    id: 'h',
-    name: 'h group',
-    romaji: 'ha hi fu he ho',
-    hira: 'はひふへほ',
-    kata: 'ハヒフヘホ',
-    category: 'basic',
-  },
-  {
-    id: 'm',
-    name: 'm group',
-    romaji: 'ma mi mu me mo',
-    hira: 'まみむめも',
-    kata: 'マミムメモ',
-    category: 'basic',
-  },
-  {
-    id: 'y',
-    name: 'y group',
-    romaji: 'ya yu yo',
-    hira: 'やゆよ',
-    kata: 'ヤユヨ',
-    category: 'basic',
-  },
-  {
-    id: 'r',
-    name: 'r group',
-    romaji: 'ra ri ru re ro',
-    hira: 'らりるれろ',
-    kata: 'ラリルレロ',
-    category: 'basic',
-  },
-  {
-    id: 'w',
-    name: 'w group',
-    romaji: 'wa wo',
-    hira: 'わを',
-    kata: 'ワヲ',
-    category: 'basic',
-  },
-  {
-    id: 'g',
-    name: 'g group',
-    romaji: 'ga gi gu ge go',
-    hira: 'がぎぐげご',
-    kata: 'ガギグゲゴ',
-    category: 'sound-marked',
-  },
-  {
-    id: 'z',
-    name: 'z group',
-    romaji: 'za ji zu ze zo',
-    hira: 'ざじずぜぞ',
-    kata: 'ザジズゼゾ',
-    category: 'sound-marked',
-  },
-  {
-    id: 'd',
-    name: 'd group',
-    romaji: 'da ji zu de do',
-    hira: 'だぢづでど',
-    kata: 'ダヂヅデド',
-    category: 'sound-marked',
-  },
-  {
-    id: 'b',
-    name: 'b group',
-    romaji: 'ba bi bu be bo',
-    hira: 'ばびぶべぼ',
-    kata: 'バビブベボ',
-    category: 'sound-marked',
-  },
-  {
-    id: 'p',
-    name: 'p group',
-    romaji: 'pa pi pu pe po',
-    hira: 'ぱぴぷぺぽ',
-    kata: 'パピプペポ',
-    category: 'sound-marked',
-  },
-]
-
-const groupCategoryNames: Record<GroupCategory, string> = {
-  basic: 'kana without marks',
-  'sound-marked': 'kana with marks',
-}
-const groupCategories = Array.from(
-  new Set(groups.map((group) => group.category)),
-)
-
 export const Route = createFileRoute('/multiple-choice')({
   head: () => ({ meta: [{ title: 'multiple choice · kana' }] }),
   component: MultipleChoiceSetup,
@@ -170,10 +30,17 @@ function compactRange(characters: string) {
   return glyphs.length < 4 ? characters : `${glyphs[0]}…${glyphs.at(-1)}`
 }
 
-function groupSample(group: KanaGroup, script: Script) {
-  if (script === 'hiragana') return group.hira
-  if (script === 'katakana') return group.kata
-  return `${compactRange(group.hira)} / ${compactRange(group.kata)}`
+const hiraganaOf = (group: Group) =>
+  group.kana.map((entry) => entry.hiragana).join('')
+const katakanaOf = (group: Group) =>
+  group.kana.map((entry) => entry.katakana).join('')
+const romajiOf = (group: Group) =>
+  group.kana.map((entry) => entry.romaji).join(' ')
+
+function groupSample(group: Group, script: ScriptChoice) {
+  if (script === 'hiragana') return hiraganaOf(group)
+  if (script === 'katakana') return katakanaOf(group)
+  return `${compactRange(hiraganaOf(group))} / ${compactRange(katakanaOf(group))}`
 }
 
 function previewCharacters(characters: string) {
@@ -183,11 +50,11 @@ function previewCharacters(characters: string) {
 }
 
 function MultipleChoiceSetup() {
-  const [script, setScript] = useState<Script>('hiragana')
+  const [script, setScript] = useState<ScriptChoice>('hiragana')
   const [selectedIds, setSelectedIds] = useState(() => new Set(['vowels']))
   const selectedGroups = groups.filter((group) => selectedIds.has(group.id))
   const kanaPerScript = selectedGroups.reduce(
-    (total, group) => total + Array.from(group.hira).length,
+    (total, group) => total + group.kana.length,
     0,
   )
   const kanaCount = kanaPerScript * (script === 'both' ? 2 : 1)
@@ -200,10 +67,10 @@ function MultipleChoiceSetup() {
   const showHiragana = script !== 'katakana'
   const showKatakana = script !== 'hiragana'
   const hiraganaPreview = previewCharacters(
-    selectedGroups.map((group) => group.hira).join(''),
+    selectedGroups.map(hiraganaOf).join(''),
   )
   const katakanaPreview = previewCharacters(
-    selectedGroups.map((group) => group.kata).join(''),
+    selectedGroups.map(katakanaOf).join(''),
   )
   const previewRows = [
     { name: 'hiragana', visible: showHiragana, characters: hiraganaPreview },
@@ -259,7 +126,7 @@ function MultipleChoiceSetup() {
         <section className="groups-section" aria-labelledby="groups-heading">
           <h2 id="groups-heading">groups to practice</h2>
           <p className="group-guidance">
-            start with vowels + n · other groups share a starting sound
+            start with vowels · other groups share a starting sound
           </p>
           <div className="compact-toolbar">
             <div className="compact-actions">
@@ -279,42 +146,24 @@ function MultipleChoiceSetup() {
 
           <fieldset className="compact-fieldset">
             <legend className="sr-only">kana groups</legend>
-            <div className="compact-groups">
-              {groupCategories.map((category) => (
-                <fieldset className="group-category" key={category}>
-                  <legend className="group-divider" data-category={category}>
-                    <span className="group-category-label">
-                      {groupCategoryNames[category]}
-                    </span>
-                    {category === 'sound-marked' && (
-                      <span className="sound-marked-help">
-                        marks change sounds · ka → ga · ha → pa
-                      </span>
-                    )}
-                  </legend>
-                  <div className="group-options">
-                    {groups
-                      .filter((group) => group.category === category)
-                      .map((group) => (
-                        <label className="group-toggle" key={group.id}>
-                          <input
-                            type="checkbox"
-                            name="groups"
-                            value={group.id}
-                            checked={selectedIds.has(group.id)}
-                            onChange={(event) =>
-                              toggleGroup(group.id, event.target.checked)
-                            }
-                          />
-                          <span className="group-name">{group.name}</span>
-                          <span className="group-sample" lang="ja">
-                            {groupSample(group, script)}
-                          </span>
-                          <span className="group-romaji">{group.romaji}</span>
-                        </label>
-                      ))}
-                  </div>
-                </fieldset>
+            <div className="group-options">
+              {groups.map((group) => (
+                <label className="group-toggle" key={group.id}>
+                  <input
+                    type="checkbox"
+                    name="groups"
+                    value={group.id}
+                    checked={selectedIds.has(group.id)}
+                    onChange={(event) =>
+                      toggleGroup(group.id, event.target.checked)
+                    }
+                  />
+                  <span className="group-name">{group.name}</span>
+                  <span className="group-sample" lang="ja">
+                    {groupSample(group, script)}
+                  </span>
+                  <span className="group-romaji">{romajiOf(group)}</span>
+                </label>
               ))}
             </div>
           </fieldset>
