@@ -137,3 +137,22 @@ button.card-face {
   font-weight: var(--weight-bold);
   cursor: pointer;
 }
+
+.summary-missed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-kana);
+  font-size: var(--text-display);
+  line-height: 1;
+}
+
+.practice .secondary-action {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-2);
+  text-decoration: none;
+}
