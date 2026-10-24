@@ -161,9 +161,16 @@ describe('building a session', () => {
     const day1 = at(26, 10)
     let session = startSession(buildQueue(pool, {}, day1))
     for (let n = 0; n < 5; n++) session = grade(session, 'knew', day1)
-    expect(kanaOf(buildQueue(pool, session.progress, at(27, 3, 59)))).toBe('')
-    const day2 = buildQueue(pool, session.progress, at(27, 4, 0))
-    // the five vowels are due again (box 2 waits 1 day), and five new cards come in
+    // pretend the vowels are already reliable, so the k group can open
+    const reliable: Progress = Object.fromEntries(
+      Object.entries(session.progress).map(([id, saved]) => [
+        id,
+        { ...saved, box: 3 },
+      ]),
+    )
+    expect(kanaOf(buildQueue(pool, reliable, at(27, 3, 59)))).toBe('')
+    const day2 = buildQueue(pool, reliable, at(27, 4, 0))
+    // the five vowels are due again, and five new cards come in
     expect(day2).toHaveLength(10)
     expect(new Set(kanaOf(day2))).toEqual(new Set('あいうえおかきくけこ'))
   })
@@ -171,12 +178,15 @@ describe('building a session', () => {
   test('due reviews and new cards are mixed, not shown as two blocks', () => {
     const now = at(26, 10)
     const today = studyDay(now)
+    // all five vowels are reliable, three of them are due today
     const progress: Progress = {
-      [a.id]: { box: 2, due: today, introduced: today - 9 },
-      [i.id]: { box: 2, due: today, introduced: today - 9 },
-      [u.id]: { box: 2, due: today, introduced: today - 9 },
+      [a.id]: { box: 3, due: today, introduced: today - 9 },
+      [i.id]: { box: 3, due: today, introduced: today - 9 },
+      [u.id]: { box: 3, due: today, introduced: today - 9 },
+      [e.id]: { box: 3, due: today + 3, introduced: today - 9 },
+      [o.id]: { box: 3, due: today + 3, introduced: today - 9 },
     }
-    const queue = buildQueue([a, i, u, ...kRow], progress, now)
+    const queue = buildQueue(pool, progress, now)
     // reviews あ い う and new か き く け こ alternate while both last
     expect(kanaOf(queue)).toBe('あかいきうくけこ')
   })

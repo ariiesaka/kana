@@ -1,4 +1,4 @@
-import type { Card } from '#/kana/kana'
+import { type Card, cardsOfGroup } from '#/kana/kana'
 
 export type Grade = 'knew' | 'missed'
 
@@ -17,6 +17,12 @@ export const NEW_CARDS_PER_DAY = 5
 
 // a study day starts at this local hour, not at midnight
 const DAY_STARTS_AT_HOUR = 4
+
+// a card is reliable from this box up; tunable
+export const RELIABLE_BOX = 3
+
+// a group is reliable when at least this share of its cards are; tunable
+export const RELIABLE_SHARE = 0.8
 
 export type CardProgress = {
   readonly box: number
@@ -73,9 +79,44 @@ export function buildQueue(
     (card) => progress[card.id]?.introduced === today,
   ).length
   const room = Math.max(0, NEW_CARDS_PER_DAY - introducedToday)
-  const newCards = pool.filter((card) => !progress[card.id]).slice(0, room)
+  const newCards = pickNewCards(pool, progress, room)
 
   return interleave(reviews, newCards)
+}
+
+// a group is reliable when enough of its cards, graded or not, sit in a high
+// enough box; never graded cards count as not reliable
+export function isGroupReliable(
+  cards: ReadonlyArray<Card>,
+  progress: Progress,
+): boolean {
+  if (cards.length === 0) return false
+  const reliable = cards.filter(
+    (card) => (progress[card.id]?.box ?? 0) >= RELIABLE_BOX,
+  ).length
+  return reliable / cards.length >= RELIABLE_SHARE
+}
+
+// new cards come from the earliest group that still has cards never graded,
+// and the next group only opens once the one before it is reliable; groups
+// follow the order of the pool, so the pool is one script in learning order
+function pickNewCards(
+  pool: ReadonlyArray<Card>,
+  progress: Progress,
+  room: number,
+): Card[] {
+  const picked: Card[] = []
+  const groupIds = [...new Set(pool.map((card) => card.groupId))]
+  let open = true
+  for (const groupId of groupIds) {
+    if (!open || picked.length >= room) break
+    const inPool = pool.filter((card) => card.groupId === groupId)
+    for (const card of inPool) {
+      if (!progress[card.id] && picked.length < room) picked.push(card)
+    }
+    open = isGroupReliable(cardsOfGroup(groupId, inPool[0].script), progress)
+  }
+  return picked
 }
 
 // alternate the two lists while both last, reviews first, then the rest
