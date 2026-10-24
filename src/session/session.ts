@@ -2,18 +2,91 @@ import type { Card } from '#/kana/kana'
 
 export type Grade = 'knew' | 'missed'
 
-// the review schedule has this many boxes, numbered from 1; tunable
-export const BOX_COUNT = 4
+// days a card waits in each box before it is due again: box 1 is the same
+// day, then 1, 3 and 7 days; tunable
+export const BOX_WAIT_DAYS = [0, 1, 3, 7] as const
+
+// the review schedule has this many boxes, numbered from 1
+export const BOX_COUNT = BOX_WAIT_DAYS.length
 
 // a missed card comes back after this many other cards; tunable
 export const MISS_RETURN_GAP = 3
 
-export type Progress = Readonly<Record<string, { box: number }>>
+// at most this many new cards are introduced per study day; tunable
+export const NEW_CARDS_PER_DAY = 5
+
+// a study day starts at this local hour, not at midnight
+export const DAY_STARTS_AT_HOUR = 4
+
+export type CardProgress = {
+  box: number
+  // the study day on which the card is due
+  due: number
+  // the study day on which the card was first graded
+  introduced: number
+}
+
+export type Progress = Readonly<Record<string, CardProgress>>
 
 export type Session = {
   // cards still to show; the first one is the current card
   readonly queue: ReadonlyArray<Card>
   readonly progress: Progress
+}
+
+// the number of the study day that contains this moment; local time, with the
+// day starting at DAY_STARTS_AT_HOUR
+export function studyDay(now: Date): number {
+  const shifted = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours() - DAY_STARTS_AT_HOUR,
+    now.getMinutes(),
+  )
+  const utcMidnight = Date.UTC(
+    shifted.getFullYear(),
+    shifted.getMonth(),
+    shifted.getDate(),
+  )
+  return Math.floor(utcMidnight / 86_400_000)
+}
+
+// the cards to practice now: due reviews, oldest first, mixed with new cards
+// from the pool (in its order) up to the daily cap
+export function buildQueue(
+  pool: ReadonlyArray<Card>,
+  progress: Progress,
+  now: Date,
+): Card[] {
+  const today = studyDay(now)
+
+  const reviews = pool
+    .map((card, index) => ({ card, index, saved: progress[card.id] }))
+    .filter((item) => item.saved && item.saved.due <= today)
+    .sort(
+      (x, y) => (x.saved?.due ?? 0) - (y.saved?.due ?? 0) || x.index - y.index,
+    )
+    .map((item) => item.card)
+
+  const introducedToday = pool.filter(
+    (card) => progress[card.id]?.introduced === today,
+  ).length
+  const room = Math.max(0, NEW_CARDS_PER_DAY - introducedToday)
+  const fresh = pool.filter((card) => !progress[card.id]).slice(0, room)
+
+  return interleave(reviews, fresh)
+}
+
+// alternate the two lists while both last, reviews first, then the rest
+function interleave<T>(first: ReadonlyArray<T>, second: ReadonlyArray<T>): T[] {
+  const mixed: T[] = []
+  const longest = Math.max(first.length, second.length)
+  for (let n = 0; n < longest; n++) {
+    if (n < first.length) mixed.push(first[n])
+    if (n < second.length) mixed.push(second[n])
+  }
+  return mixed
 }
 
 export function startSession(
@@ -35,24 +108,37 @@ export function boxOf(session: Session, card: Card): number {
   return session.progress[card.id]?.box ?? 1
 }
 
-export function grade(session: Session, verdict: Grade): Session {
+export function grade(session: Session, verdict: Grade, now: Date): Session {
   const card = currentCard(session)
   if (!card) return session
 
+  const today = studyDay(now)
   const rest = session.queue.slice(1)
   if (verdict === 'knew') {
     const box = Math.min(boxOf(session, card) + 1, BOX_COUNT)
-    return { queue: rest, progress: withBox(session.progress, card, box) }
+    return {
+      queue: rest,
+      progress: withBox(session.progress, card, box, today),
+    }
   }
 
   // missed: back to box 1, and shown again after a few other cards
   const gap = Math.min(MISS_RETURN_GAP, rest.length)
   return {
     queue: [...rest.slice(0, gap), card, ...rest.slice(gap)],
-    progress: withBox(session.progress, card, 1),
+    progress: withBox(session.progress, card, 1, today),
   }
 }
 
-function withBox(progress: Progress, card: Card, box: number): Progress {
-  return { ...progress, [card.id]: { box } }
+function withBox(
+  progress: Progress,
+  card: Card,
+  box: number,
+  today: number,
+): Progress {
+  const introduced = progress[card.id]?.introduced ?? today
+  return {
+    ...progress,
+    [card.id]: { box, due: today + BOX_WAIT_DAYS[box - 1], introduced },
+  }
 }

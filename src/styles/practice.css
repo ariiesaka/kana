@@ -124,6 +124,9 @@ button.card-face {
 }
 
 .primary-action {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   min-height: var(--target);
   margin-top: var(--space-2);
   padding: 10px var(--space-4);

@@ -30,7 +30,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 
 - Initial release is static and does not require accounts.
 - The home screen offers multiple choice, matching, and flashcards as practice-format choices, ordered from more guidance to recall.
-- Flashcards open a first session on the vowels in hiragana, held in memory only. Multiple choice opens a kana-led setup with hiragana, katakana, or both; its practice is coming soon.
+- Flashcards open a session on the vowels in hiragana; the learner's progress is saved in this browser. Multiple choice opens a kana-led setup with hiragana, katakana, or both; its practice is coming soon.
 - Study progress is saved in this browser only; see docs/adr/0001-local-progress-in-browser-storage.md.
 - Login, syncing across devices, and streaks are long-term ideas.
 - The home screen is designed before its practice flows.

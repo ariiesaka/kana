@@ -2,35 +2,51 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cardsOfGroup, counterpart } from '#/kana/kana'
 import {
+  buildQueue,
   currentCard,
   type Grade,
   grade,
   isFinished,
   startSession,
 } from '#/session/session'
+import { progressStore } from '#/storage/progress-store'
 
 export const Route = createFileRoute('/practice')({
   head: () => ({ meta: [{ title: 'flashcards · kana' }] }),
   component: Practice,
 })
 
-// the first session practices the vowels in hiragana
-const firstCards = cardsOfGroup('vowels', 'hiragana')
+// the cards that can be practiced for now: the vowels in hiragana
+const pool = cardsOfGroup('vowels', 'hiragana')
 
 function Practice() {
-  const [session, setSession] = useState(() => startSession(firstCards))
+  // saved progress decides what is due today; this runs once, when the screen opens
+  const [initial] = useState(() => {
+    const progress = progressStore.load()
+    const queue = buildQueue(pool, progress, new Date())
+    return { session: startSession(queue, progress), count: queue.length }
+  })
+  const [session, setSession] = useState(initial.session)
   const [revealed, setRevealed] = useState(false)
   const faceRef = useRef<HTMLButtonElement>(null)
   const missedRef = useRef<HTMLButtonElement>(null)
-  const againRef = useRef<HTMLButtonElement>(null)
+  const homeRef = useRef<HTMLAnchorElement>(null)
 
   const card = currentCard(session)
   const finished = isFinished(session)
 
   const answer = useCallback((verdict: Grade) => {
-    setSession((current) => grade(current, verdict))
+    const now = new Date()
+    setSession((current) => grade(current, verdict, now))
     setRevealed(false)
   }, [])
+
+  // save after every grade; skip the first render so that unreadable saved
+  // data is never overwritten before the learner has graded anything
+  useEffect(() => {
+    if (session.progress === initial.session.progress) return
+    progressStore.save(session.progress)
+  }, [session.progress, initial])
 
   // keyboard: 1 or left arrow is missed, 2 or right arrow is knew it
   useEffect(() => {
@@ -51,7 +67,7 @@ function Practice() {
 
   // focus follows the flow: to the grade buttons after reveal, back to the card after grading
   useEffect(() => {
-    if (finished) againRef.current?.focus()
+    if (finished) homeRef.current?.focus()
     else if (revealed) missedRef.current?.focus()
     else faceRef.current?.focus()
   }, [revealed, finished])
@@ -71,21 +87,17 @@ function Practice() {
 
         {!card ? (
           <section className="practice-done" aria-labelledby="done-heading">
-            <h2 id="done-heading">done for now</h2>
+            <h2 id="done-heading">
+              {initial.count === 0 ? 'nothing due right now' : 'done for now'}
+            </h2>
             <p className="intro">
-              you went through all {firstCards.length} cards
+              {initial.count === 0
+                ? 'the next cards are ready tomorrow'
+                : `you went through ${initial.count} cards`}
             </p>
-            <button
-              ref={againRef}
-              type="button"
-              className="primary-action"
-              onClick={() => {
-                setSession(startSession(firstCards))
-                setRevealed(false)
-              }}
-            >
-              practice again
-            </button>
+            <Link ref={homeRef} to="/" className="primary-action">
+              back to activities
+            </Link>
           </section>
         ) : (
           <section className="flashcard" aria-label="flashcard">
