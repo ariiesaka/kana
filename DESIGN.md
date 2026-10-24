@@ -16,7 +16,7 @@ Kana shares the look of the personal site, [ariiesaka.dev](https://ariiesaka.dev
 | --- | --- |
 | Background | `#111111` |
 | Text | `#f5f5f5` |
-| Link underline | `#888888`, solid on hover and focus |
+| Link underline | `#888888`, becomes the text color on hover |
 | Typeface | IBM Plex Sans 400 and 700 |
 | Heading | 2rem, bold, `-0.035em` tracking, 1.2 line height |
 | Measure | 65ch column |
@@ -27,7 +27,6 @@ Kana shares the look of the personal site, [ariiesaka.dev](https://ariiesaka.dev
 | Token | Value | Use |
 | --- | --- | --- |
 | `--color-bg` | `#111111` | page ground |
-| `--color-surface` | `#1a1a1a` | raised areas |
 | `--color-surface-selected` | `#242424` | selected controls, disabled button |
 | `--color-text` | `#f5f5f5` | text, selected borders, primary button |
 | `--color-text-muted` | `#a3a3a3` | secondary text |
@@ -57,7 +56,7 @@ Text needs 4.5:1 and non-text parts of controls need 3:1.
 | missed on surface-selected | 7.8 | 4.5 |
 | bg on text (primary button) | 17.3 | 4.5 |
 
-`--color-line` is about 1.4:1 and is only used for dividers that do not identify a control.
+`--color-attention` is an alias of `--color-missed`, so it shares those ratios. `--color-line` is about 1.4:1 and is only used for dividers that do not identify a control.
 
 ## Type
 
@@ -70,7 +69,7 @@ Text needs 4.5:1 and non-text parts of controls need 3:1.
 | `--text-title` | 2rem | page titles |
 | `--weight-regular` / `bold` | 400 / 700 | the only two weights |
 
-Fonts are self-hosted. IBM Plex Sans comes from the `@fontsource/ibm-plex-sans` package (latin, 400 and 700). IBM Plex Sans JP is limited to the slices that hold hiragana and katakana, copied from `@fontsource/ibm-plex-sans-jp` 5.3.1 into `src/fonts` with its license, so the app makes no third-party font request. Mark kana with `lang="ja"` so they use the kana font.
+Fonts are self-hosted. IBM Plex Sans comes from the `@fontsource/ibm-plex-sans` package (latin, 400 and 700). IBM Plex Sans JP is limited to the 8 font slices that contain hiragana and katakana (each slice also carries some unrelated glyphs), copied from `@fontsource/ibm-plex-sans-jp` 5.3.1 into `src/fonts` with its license; the license for IBM Plex Sans is in the same folder. The app makes no third-party font request. Mark kana with `lang="ja"` so they use the kana font.
 
 ## Space, shape, and motion
 
@@ -78,6 +77,8 @@ Fonts are self-hosted. IBM Plex Sans comes from the `@fontsource/ibm-plex-sans` 
 - `--measure` is 65ch and `--gutter` is 1rem on each side.
 - `--target` is 44px, the minimum size of any control.
 - Radius is small: 4px for tiles, 6px for buttons and choices.
+- Hairline offsets and tile heights stay local to the component styles; they are layout details, not tokens. Colors, type, space steps, focus and motion are the tokens.
+- The lowercase k favicon uses the same ground and text colors as the tokens.
 - Transitions use `--duration-fast` (120ms) and `--ease-out`. Under `prefers-reduced-motion` the duration is 0.
 
 ## Feedback

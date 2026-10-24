@@ -97,7 +97,7 @@
 
 .script-choice:has(:focus-visible) {
   outline: var(--focus-ring);
-  outline-offset: 3px;
+  outline-offset: var(--focus-offset);
 }
 
 .script-example {
@@ -249,7 +249,7 @@
 
 .group-toggle:has(:focus-visible) {
   outline: var(--focus-ring);
-  outline-offset: 3px;
+  outline-offset: var(--focus-offset);
 }
 
 .group-name,
