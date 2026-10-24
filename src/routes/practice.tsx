@@ -84,6 +84,9 @@ function Practice() {
         <Link className="back-link" to="/">
           ← activities
         </Link>
+        <Link className="back-link settings-link" to="/settings">
+          settings
+        </Link>
         <h1>flashcards</h1>
 
         {!card ? (

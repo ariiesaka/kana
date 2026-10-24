@@ -1,7 +1,12 @@
 import { BOX_COUNT, type CardProgress, type Progress } from '#/session/session'
+import {
+  DEFAULT_SETTINGS,
+  type Settings,
+  toSettings,
+} from '#/settings/settings'
 
-// the only place that knows where progress lives; swap this module to change
-// the backend (see ADR 0001)
+// the only place that knows where progress and settings live; swap this module
+// to change the backend (see ADR 0001)
 export const STORAGE_KEY = 'kana:progress'
 const VERSION = 1
 
@@ -14,44 +19,65 @@ export type KeyValueStorage = {
 export type ProgressStore = {
   load(): Progress
   save(progress: Progress): void
+  loadSettings(): Settings
+  saveSettings(settings: Settings): void
+  // forgets every card and puts the settings back to the defaults
+  reset(): void
 }
+
+type Saved = { progress: Progress; settings: Settings }
+
+const EMPTY: Saved = { progress: {}, settings: DEFAULT_SETTINGS }
 
 // storage can be missing or throw (private modes, blocked cookies, full disk);
 // the store then behaves as if nothing was saved, and the session still works
 export function createProgressStore(
   storage: KeyValueStorage | undefined,
 ): ProgressStore {
+  function read(): Saved {
+    try {
+      const raw = storage?.getItem(STORAGE_KEY)
+      return raw ? parse(raw) : EMPTY
+    } catch {
+      return EMPTY
+    }
+  }
+
+  function write(saved: Saved) {
+    try {
+      storage?.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ version: VERSION, ...saved }),
+      )
+    } catch {
+      // nothing saved; the learner keeps practicing
+    }
+  }
+
   return {
-    load() {
-      try {
-        const raw = storage?.getItem(STORAGE_KEY)
-        return raw ? parse(raw) : {}
-      } catch {
-        return {}
-      }
-    },
-    save(progress) {
-      try {
-        storage?.setItem(
-          STORAGE_KEY,
-          JSON.stringify({ version: VERSION, progress }),
-        )
-      } catch {
-        // nothing saved; the learner keeps practicing
-      }
-    },
+    load: () => read().progress,
+    save: (progress) => write({ ...read(), progress }),
+    loadSettings: () => read().settings,
+    saveSettings: (settings) => write({ ...read(), settings }),
+    reset: () => write(EMPTY),
   }
 }
 
-function parse(raw: string): Progress {
-  // data from a newer version is ignored, so the next grade overwrites it;
+function parse(raw: string): Saved {
+  // data from a newer version is ignored, so the next write overwrites it;
   // fine while there is one version, worth revisiting when there are two
   const data: unknown = JSON.parse(raw)
-  if (!isRecord(data) || data.version !== VERSION || !isRecord(data.progress)) {
-    return {}
+  if (!isRecord(data) || data.version !== VERSION) return EMPTY
+  return {
+    progress: toProgress(data.progress),
+    settings: toSettings(data.settings),
   }
+}
+
+function toProgress(value: unknown): Progress {
+  if (!isRecord(value)) return {}
   const valid: Record<string, CardProgress> = {}
-  for (const [id, entry] of Object.entries(data.progress)) {
+  for (const [id, entry] of Object.entries(value)) {
     const clean = toCardProgress(entry)
     if (clean) valid[id] = clean
   }
