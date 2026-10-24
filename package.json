@@ -10,10 +10,10 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "vite dev --port 3000 --strictPort",
     "generate-routes": "tsr generate",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --port 3000 --strictPort"
   },
   "dependencies": {
     "@tanstack/react-router": "1.170.46",

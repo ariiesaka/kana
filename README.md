@@ -15,7 +15,7 @@ use node.js 24 and the pnpm version declared in [package.json](package.json).
     pnpm install
     pnpm dev
 
-then open [http://localhost:3000](http://localhost:3000).
+the dev and preview servers both use port 3000 and exit if it is already occupied, so run one at a time. then open [http://localhost:3000](http://localhost:3000).
 
 ## stack
 
