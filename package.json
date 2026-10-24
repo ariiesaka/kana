@@ -8,7 +8,6 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000 --strictPort",
-    "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview --port 3000 --strictPort",
     "typecheck": "tsc --noEmit",
@@ -18,13 +17,12 @@
   },
   "dependencies": {
     "@tanstack/react-router": "1.170.46",
-    "@tanstack/react-start": "1.169.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",
-    "@tanstack/router-cli": "^1.132.0",
+    "@tanstack/router-plugin": "1.168.48",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

@@ -1,47 +1,15 @@
-import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
-
-import appCss from '../styles.css?url'
+import { createRootRoute, HeadContent, Outlet } from '@tanstack/react-router'
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'kana',
-      },
-      {
-        name: 'description',
-        content: 'reading practice for hiragana and katakana',
-      },
-    ],
-    links: [
-      { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
-  shellComponent: RootDocument,
+  head: () => ({ meta: [{ title: 'kana' }] }),
+  component: Root,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function Root() {
   return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-
-        <Scripts />
-      </body>
-    </html>
+    <>
+      <HeadContent />
+      <Outlet />
+    </>
   )
 }

@@ -1,17 +1,10 @@
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
-  plugins: [
-    tanstackStart({
-      spa: {
-        enabled: true,
-      },
-    }),
-    viteReact(),
-  ],
+  plugins: [tanstackRouter({ target: 'react' }), viteReact()],
 })
 
 export default config
