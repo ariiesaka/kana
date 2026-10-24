@@ -2,6 +2,15 @@ import { Fragment, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 type Script = 'hiragana' | 'katakana' | 'both'
+type GroupCategory = 'basic' | 'sound-marked'
+
+type KanaGroup = {
+  id: string
+  name: string
+  hira: string
+  kata: string
+  category: GroupCategory
+}
 
 const scripts: Array<{
   id: Script
@@ -14,25 +23,28 @@ const scripts: Array<{
   { id: 'both', name: 'both', example: 'あ ア', description: 'both scripts' },
 ]
 
-const groups = [
-  { id: 'vowels', name: 'vowels + n', hira: 'あいうえおん', kata: 'アイウエオン' },
-  { id: 'k', name: 'k-row', hira: 'かきくけこ', kata: 'カキクケコ' },
-  { id: 's', name: 's-row', hira: 'さしすせそ', kata: 'サシスセソ' },
-  { id: 't', name: 't-row', hira: 'たちつてと', kata: 'タチツテト' },
-  { id: 'n', name: 'n-row', hira: 'なにぬねの', kata: 'ナニヌネノ' },
-  { id: 'h', name: 'h-row', hira: 'はひふへほ', kata: 'ハヒフヘホ' },
-  { id: 'm', name: 'm-row', hira: 'まみむめも', kata: 'マミムメモ' },
-  { id: 'y', name: 'y-row', hira: 'やゆよ', kata: 'ヤユヨ' },
-  { id: 'r', name: 'r-row', hira: 'らりるれろ', kata: 'ラリルレロ' },
-  { id: 'w', name: 'w-row', hira: 'わを', kata: 'ワヲ' },
-  { id: 'g', name: 'g-row', hira: 'がぎぐげご', kata: 'ガギグゲゴ' },
-  { id: 'z', name: 'z-row', hira: 'ざじずぜぞ', kata: 'ザジズゼゾ' },
-  { id: 'd', name: 'd-row', hira: 'だぢづでど', kata: 'ダヂヅデド' },
-  { id: 'b', name: 'b-row', hira: 'ばびぶべぼ', kata: 'バビブベボ' },
-  { id: 'p', name: 'p-row', hira: 'ぱぴぷぺぽ', kata: 'パピプペポ' },
+const groups: KanaGroup[] = [
+  { id: 'vowels', name: 'vowels + n', hira: 'あいうえおん', kata: 'アイウエオン', category: 'basic' },
+  { id: 'k', name: 'k-row', hira: 'かきくけこ', kata: 'カキクケコ', category: 'basic' },
+  { id: 's', name: 's-row', hira: 'さしすせそ', kata: 'サシスセソ', category: 'basic' },
+  { id: 't', name: 't-row', hira: 'たちつてと', kata: 'タチツテト', category: 'basic' },
+  { id: 'n', name: 'n-row', hira: 'なにぬねの', kata: 'ナニヌネノ', category: 'basic' },
+  { id: 'h', name: 'h-row', hira: 'はひふへほ', kata: 'ハヒフヘホ', category: 'basic' },
+  { id: 'm', name: 'm-row', hira: 'まみむめも', kata: 'マミムメモ', category: 'basic' },
+  { id: 'y', name: 'y-row', hira: 'やゆよ', kata: 'ヤユヨ', category: 'basic' },
+  { id: 'r', name: 'r-row', hira: 'らりるれろ', kata: 'ラリルレロ', category: 'basic' },
+  { id: 'w', name: 'w-row', hira: 'わを', kata: 'ワヲ', category: 'basic' },
+  { id: 'g', name: 'g-row', hira: 'がぎぐげご', kata: 'ガギグゲゴ', category: 'sound-marked' },
+  { id: 'z', name: 'z-row', hira: 'ざじずぜぞ', kata: 'ザジズゼゾ', category: 'sound-marked' },
+  { id: 'd', name: 'd-row', hira: 'だぢづでど', kata: 'ダヂヅデド', category: 'sound-marked' },
+  { id: 'b', name: 'b-row', hira: 'ばびぶべぼ', kata: 'バビブベボ', category: 'sound-marked' },
+  { id: 'p', name: 'p-row', hira: 'ぱぴぷぺぽ', kata: 'パピプペポ', category: 'sound-marked' },
 ]
 
-const voicedGroupsStart = 10
+const groupCategoryNames: Record<GroupCategory, string> = {
+  basic: 'basic kana',
+  'sound-marked': 'sound-marked kana',
+}
 
 export const Route = createFileRoute('/multiple-choice')({
   head: () => ({ meta: [{ title: 'multiple choice · kana' }] }),
@@ -44,10 +56,10 @@ function compactRange(characters: string) {
   return glyphs.length < 4 ? characters : `${glyphs[0]}…${glyphs.at(-1)}`
 }
 
-function groupSample(group: (typeof groups)[number], script: Script) {
+function groupSample(group: KanaGroup, script: Script) {
   if (script === 'hiragana') return group.hira
   if (script === 'katakana') return group.kata
-  return compactRange(group.hira)
+  return `${compactRange(group.hira)} / ${compactRange(group.kata)}`
 }
 
 function previewCharacters(characters: string) {
@@ -69,7 +81,7 @@ function MultipleChoiceSetup() {
     ? 'choose at least one group'
     : selectedGroups.length === 1
       ? selectedGroups[0].name
-      : `${selectedGroups.length} groups · shuffled`
+      : `${selectedGroups.length} groups selected`
   const showHiragana = script !== 'katakana'
   const showKatakana = script !== 'hiragana'
   const hiraganaPreview = previewCharacters(selectedGroups.map((group) => group.hira).join(''))
@@ -135,15 +147,12 @@ function MultipleChoiceSetup() {
             <div className="compact-groups">
               {groups.map((group, index) => (
                 <Fragment key={group.id}>
-                {index === 0 && (
-                  <div className="group-divider basic-divider">
-                    <span className="group-category-label">basic kana</span>
-                  </div>
-                )}
-                  {index === voicedGroupsStart && (
-                    <div className="group-divider">
-                    <span className="group-category-label">sound-marked kana</span>
-                    <span className="voiced-help">small marks · か→が は→ぱ</span>
+                  {(index === 0 || groups[index - 1].category !== group.category) && (
+                    <div className={`group-divider${group.category === 'basic' ? ' basic-divider' : ''}`}>
+                      <span className="group-category-label">{groupCategoryNames[group.category]}</span>
+                      {group.category === 'sound-marked' && (
+                        <span className="voiced-help">small marks · か→が は→ぱ</span>
+                      )}
                     </div>
                   )}
                   <label className="group-toggle">
