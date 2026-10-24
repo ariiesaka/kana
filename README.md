@@ -17,6 +17,20 @@ use the bun version declared in [package.json](package.json).
 
 the dev and preview servers both use port 3000 and exit if it is already occupied, so run one at a time. then open [http://localhost:3000](http://localhost:3000).
 
+## other commands
+
+    bun run build
+    bun run typecheck
+    bun run test
+    bun run lint
+    bun run format
+
+`lint` checks the code with biome and `format` fixes what it can. new package versions are installed only after they have been published for a day (see [bunfig.toml](bunfig.toml)).
+
+## deploy
+
+kana deploys to cloudflare as static files. use `bun install` as the install command and `bun run build` as the build command, and set `BUN_VERSION` to the version pinned in [package.json](package.json), because cloudflare's default bun is older.
+
 ## stack
 
 React, TanStack Router, TypeScript, Vite, and Bun. the decisions behind this stack are recorded in [docs/adr](docs/adr).

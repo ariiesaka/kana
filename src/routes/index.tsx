@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 const practiceModes = [
   {
@@ -67,12 +67,17 @@ function Home() {
             <li key={mode.id}>
               {mode.id === 'multiple-choice' ? (
                 <Link className="mode-choice mode-link" to="/multiple-choice">
-                  <span className="mode-name">{mode.name} <span aria-hidden="true">→</span></span>
+                  <span className="mode-name">
+                    {mode.name} <span aria-hidden="true">→</span>
+                  </span>
                   <span className="mode-description">{mode.description}</span>
                 </Link>
               ) : (
                 <div className="mode-choice">
-                  <span className="mode-name">{mode.name}<span className="mode-availability">coming soon</span></span>
+                  <span className="mode-name">
+                    {mode.name}
+                    <span className="mode-availability">coming soon</span>
+                  </span>
                   <span className="mode-description">{mode.description}</span>
                 </div>
               )}

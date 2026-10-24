@@ -340,8 +340,13 @@ a {
 }
 
 @media (min-width: 700px) {
-  .script-choices { gap: 12px; }
-  .script-choice { padding-top: 27px; padding-bottom: 20px; }
+  .script-choices {
+    gap: 12px;
+  }
+  .script-choice {
+    padding-top: 27px;
+    padding-bottom: 20px;
+  }
 }
 
 .mode-availability {
