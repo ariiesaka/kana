@@ -118,7 +118,7 @@ function pickNewCards(
 ): Card[] {
   const picked: Card[] = []
   const groupIds = [...new Set(pool.map((card) => card.groupId))]
-  let hiraganaOpen = true
+  let previousGroupReliable = true
   for (const groupId of groupIds) {
     if (picked.length >= room) break
     const hiraganaReliable = isGroupReliable(
@@ -127,10 +127,11 @@ function pickNewCards(
     )
     for (const card of pool) {
       if (card.groupId !== groupId || progress[card.id]) continue
-      const open = card.script === 'hiragana' ? hiraganaOpen : hiraganaReliable
+      const open =
+        card.script === 'hiragana' ? previousGroupReliable : hiraganaReliable
       if (open && picked.length < room) picked.push(card)
     }
-    hiraganaOpen = hiraganaReliable
+    previousGroupReliable = hiraganaReliable
   }
   return picked
 }
