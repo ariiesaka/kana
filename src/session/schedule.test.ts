@@ -59,7 +59,7 @@ describe('box waits', () => {
     })
   })
 
-  test('a card in box 2 is due 3 days after it moves to box 3, then 7 after box 4', () => {
+  test('later boxes wait 3 days, then 7 days', () => {
     const now = at(26, 10)
     const today = studyDay(now)
     const inBox2 = startSession([a], {
@@ -127,7 +127,7 @@ describe('building a session', () => {
     expect(kanaOf(buildQueue([a], progress, at(27, 4, 0)))).toBe('あ')
   })
 
-  test('overdue cards come back oldest first', () => {
+  test('cards that have waited longest come back first', () => {
     const now = at(26, 10)
     const today = studyDay(now)
     const progress: Progress = {
@@ -191,7 +191,7 @@ describe('building a session', () => {
     )
   })
 
-  test('uses every card in the pool only once', () => {
+  test('never offers the same card twice', () => {
     const queue = buildQueue(pool, {}, at(26, 10))
     expect(new Set(queue.map((card) => card.id)).size).toBe(queue.length)
     expect(queue.includes(e)).toBe(true)

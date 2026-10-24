@@ -16,14 +16,14 @@ export const MISS_RETURN_GAP = 3
 export const NEW_CARDS_PER_DAY = 5
 
 // a study day starts at this local hour, not at midnight
-export const DAY_STARTS_AT_HOUR = 4
+const DAY_STARTS_AT_HOUR = 4
 
 export type CardProgress = {
-  box: number
+  readonly box: number
   // the study day on which the card is due
-  due: number
+  readonly due: number
   // the study day on which the card was first graded
-  introduced: number
+  readonly introduced: number
 }
 
 export type Progress = Readonly<Record<string, CardProgress>>
@@ -62,20 +62,20 @@ export function buildQueue(
   const today = studyDay(now)
 
   const reviews = pool
-    .map((card, index) => ({ card, index, saved: progress[card.id] }))
-    .filter((item) => item.saved && item.saved.due <= today)
-    .sort(
-      (x, y) => (x.saved?.due ?? 0) - (y.saved?.due ?? 0) || x.index - y.index,
-    )
+    .flatMap((card, index) => {
+      const due = progress[card.id]?.due
+      return due !== undefined && due <= today ? [{ card, index, due }] : []
+    })
+    .sort((x, y) => x.due - y.due || x.index - y.index)
     .map((item) => item.card)
 
   const introducedToday = pool.filter(
     (card) => progress[card.id]?.introduced === today,
   ).length
   const room = Math.max(0, NEW_CARDS_PER_DAY - introducedToday)
-  const fresh = pool.filter((card) => !progress[card.id]).slice(0, room)
+  const newCards = pool.filter((card) => !progress[card.id]).slice(0, room)
 
-  return interleave(reviews, fresh)
+  return interleave(reviews, newCards)
 }
 
 // alternate the two lists while both last, reviews first, then the rest

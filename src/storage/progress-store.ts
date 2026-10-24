@@ -44,13 +44,16 @@ export function createProgressStore(
 }
 
 function parse(raw: string): Progress {
+  // data from a newer version is ignored, so the next grade overwrites it;
+  // fine while there is one version, worth revisiting when there are two
   const data: unknown = JSON.parse(raw)
   if (!isRecord(data) || data.version !== VERSION || !isRecord(data.progress)) {
     return {}
   }
   const valid: Record<string, CardProgress> = {}
   for (const [id, entry] of Object.entries(data.progress)) {
-    if (isCardProgress(entry)) valid[id] = entry
+    const clean = toCardProgress(entry)
+    if (clean) valid[id] = clean
   }
   return valid
 }
@@ -59,15 +62,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function isCardProgress(value: unknown): value is CardProgress {
-  return (
-    isRecord(value) &&
-    Number.isInteger(value.box) &&
-    (value.box as number) >= 1 &&
-    (value.box as number) <= BOX_COUNT &&
-    Number.isFinite(value.due) &&
-    Number.isFinite(value.introduced)
-  )
+// keeps only the three known fields, and only when they make sense
+function toCardProgress(value: unknown): CardProgress | undefined {
+  if (!isRecord(value)) return undefined
+  const { box, due, introduced } = value
+  if (
+    typeof box !== 'number' ||
+    typeof due !== 'number' ||
+    typeof introduced !== 'number'
+  ) {
+    return undefined
+  }
+  if (!Number.isInteger(box) || box < 1 || box > BOX_COUNT) return undefined
+  if (!Number.isInteger(due) || !Number.isInteger(introduced)) return undefined
+  return { box, due, introduced }
 }
 
 function browserStorage(): KeyValueStorage | undefined {

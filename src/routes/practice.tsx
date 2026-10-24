@@ -41,8 +41,8 @@ function Practice() {
     setRevealed(false)
   }, [])
 
-  // save after every grade; skip the first render so that unreadable saved
-  // data is never overwritten before the learner has graded anything
+  // save after every grade; nothing is saved until the progress has changed,
+  // so unreadable saved data is not overwritten before anything is graded
   useEffect(() => {
     if (session.progress === initial.session.progress) return
     progressStore.save(session.progress)
@@ -93,7 +93,7 @@ function Practice() {
             <p className="intro">
               {initial.count === 0
                 ? 'the next cards are ready tomorrow'
-                : `you went through ${initial.count} cards`}
+                : "you went through today's cards"}
             </p>
             <Link ref={homeRef} to="/" className="primary-action">
               back to activities

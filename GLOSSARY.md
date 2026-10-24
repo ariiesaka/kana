@@ -33,7 +33,7 @@ A card's stage in the review schedule, numbered from 1. Higher boxes wait longer
 _Avoid_: bucket, stage
 
 **Due**:
-A card whose wait has passed, so it is ready to be reviewed. A new card is due immediately.
+A card whose box wait has passed, so it is ready to be reviewed.
 _Avoid_: pending, overdue
 
 **Reliable**:

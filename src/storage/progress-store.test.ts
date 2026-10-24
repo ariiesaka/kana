@@ -67,8 +67,22 @@ describe('progress store', () => {
     expect(Object.keys(loaded)).toEqual(['hiragana:あ'])
   })
 
+  test('extra fields and fractional days are not accepted', () => {
+    const saved = JSON.stringify({
+      version: 1,
+      progress: {
+        'hiragana:あ': { box: 2, due: 5, introduced: 4, note: 'extra' },
+        'hiragana:い': { box: 2, due: 5.5, introduced: 4 },
+      },
+    })
+    const loaded = createProgressStore(
+      fakeStorage({ [STORAGE_KEY]: saved }),
+    ).load()
+    expect(loaded).toEqual({ 'hiragana:あ': { box: 2, due: 5, introduced: 4 } })
+  })
+
   test('saved data from a newer version is ignored', () => {
-    const saved = JSON.stringify({ version: 99, progress: progress })
+    const saved = JSON.stringify({ version: 99, progress })
     expect(
       createProgressStore(fakeStorage({ [STORAGE_KEY]: saved })).load(),
     ).toEqual({})
