@@ -1,6 +1,6 @@
 # Build Kana as a client-only React app, not on TanStack Start
 
-Kana is a static app with a few screens and no server, and its progress lives in the browser (ADR 0001). TanStack Start adds server rendering and server functions that Kana does not use, and server rendering makes browser-only storage harder, since a server render cannot read localStorage and the first client render must match it. Kana moves to Vite, React and TanStack Router as a client-only app deployed as static files. The router, Vite, React, TypeScript and pnpm stay. A server can be added later if accounts or syncing arrive.
+Kana is a static app with a few screens and no server, and its progress lives in the browser (ADR 0001). TanStack Start adds server rendering and server functions that Kana does not use, and server rendering makes browser-only storage harder, since a server render cannot read localStorage and the first client render must match it. Kana moves to Vite, React and TanStack Router as a client-only app deployed as static files. The router, Vite, React and TypeScript stay; the package manager is decided in ADR 0003. A server can be added later if accounts or syncing arrive.
 
 ## Considered options
 

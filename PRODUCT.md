@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-React with TanStack Router, TypeScript, Vite, and pnpm, as a client-only app (see docs/adr/0002-client-only-app-without-start.md). The initial release is a static single-page app; accounts and server-backed progress are long-term ideas, not part of the initial release.
+React with TanStack Router, TypeScript, Vite, and Bun, as a client-only app (see docs/adr/0002-client-only-app-without-start.md and docs/adr/0003-bun-for-packages-and-scripts.md). The initial release is a static single-page app; accounts and server-backed progress are long-term ideas, not part of the initial release.
 
 ## Users
 

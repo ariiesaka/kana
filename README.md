@@ -10,16 +10,16 @@ kana is a static app at this stage, with no accounts. the first practice loop, f
 
 ## run locally
 
-use node.js 24 and the pnpm version declared in [package.json](package.json).
+use the bun version declared in [package.json](package.json).
 
-    pnpm install
-    pnpm dev
+    bun install
+    bun run dev
 
 the dev and preview servers both use port 3000 and exit if it is already occupied, so run one at a time. then open [http://localhost:3000](http://localhost:3000).
 
 ## stack
 
-React, TanStack Router, TypeScript, Vite, and pnpm. kana is moving from TanStack Start to a client-only app; see [the decision](docs/adr/0002-client-only-app-without-start.md).
+React, TanStack Router, TypeScript, Vite, and Bun. kana is moving from TanStack Start to a client-only app and from pnpm to Bun; see [the app decision](docs/adr/0002-client-only-app-without-start.md) and [the tooling decision](docs/adr/0003-bun-for-packages-and-scripts.md).
 
 ## design
 
