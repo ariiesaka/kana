@@ -19,7 +19,7 @@ the dev and preview servers both use port 3000 and exit if it is already occupie
 
 ## stack
 
-React, TanStack Start, TypeScript, Vite, and pnpm.
+React, TanStack Router, TypeScript, Vite, and pnpm. kana is moving from TanStack Start to a client-only app; see [the decision](docs/adr/0002-client-only-app-without-start.md).
 
 ## design
 
