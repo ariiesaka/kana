@@ -7,10 +7,10 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "bun --bun vite dev --port 3000 --strictPort",
+    "dev": "vite dev --port 3000 --strictPort",
     "generate-routes": "tsr generate",
-    "build": "bun --bun vite build",
-    "preview": "bun --bun vite preview --port 3000 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --port 3000 --strictPort",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "biome check .",

@@ -1,4 +1,7 @@
+[run]
+# run package scripts on the bun runtime even when a tool's shebang names node
+bun = true
+
 [install]
-# only install package versions that have been published for at least a day,
-# keeping the protection pnpm gave against freshly published releases
+# only install package versions that have been published for at least a day
 minimumReleaseAge = 86400
