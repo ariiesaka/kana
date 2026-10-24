@@ -1,0 +1,4 @@
+[install]
+# only install package versions that have been published for at least a day,
+# keeping the protection pnpm gave against freshly published releases
+minimumReleaseAge = 86400

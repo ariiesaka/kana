@@ -9,4 +9,4 @@ Kana uses Bun, pinned to 1.4.0, to install dependencies and run scripts, instead
 
 ## Consequences
 
-- The release-age guard that pnpm gave for new dependency versions has no confirmed Bun equivalent yet; the switch work decides the replacement or records going without.
+- The release-age guard that pnpm gave for new dependency versions is kept with Bun's `minimumReleaseAge` setting (one day), checked on Bun 1.4.0.

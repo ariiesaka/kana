@@ -1,5 +1,5 @@
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Link, createFileRoute } from '@tanstack/react-router'
 
 type Script = 'hiragana' | 'katakana' | 'both'
 type GroupCategory = 'basic' | 'sound-marked'
@@ -21,32 +21,144 @@ const scripts: Array<{
 }> = [
   { id: 'hiragana', name: 'hiragana', example: 'あ', description: 'rounded' },
   { id: 'katakana', name: 'katakana', example: 'ア', description: 'angular' },
-  { id: 'both', name: 'both', example: 'あ ア', description: 'one script per question' },
+  {
+    id: 'both',
+    name: 'both',
+    example: 'あ ア',
+    description: 'one script per question',
+  },
 ]
 
 const groups: KanaGroup[] = [
-  { id: 'vowels', name: 'vowels + n', romaji: 'a i u e o n', hira: 'あいうえおん', kata: 'アイウエオン', category: 'basic' },
-  { id: 'k', name: 'k group', romaji: 'ka ki ku ke ko', hira: 'かきくけこ', kata: 'カキクケコ', category: 'basic' },
-  { id: 's', name: 's group', romaji: 'sa shi su se so', hira: 'さしすせそ', kata: 'サシスセソ', category: 'basic' },
-  { id: 't', name: 't group', romaji: 'ta chi tsu te to', hira: 'たちつてと', kata: 'タチツテト', category: 'basic' },
-  { id: 'n', name: 'n group', romaji: 'na ni nu ne no', hira: 'なにぬねの', kata: 'ナニヌネノ', category: 'basic' },
-  { id: 'h', name: 'h group', romaji: 'ha hi fu he ho', hira: 'はひふへほ', kata: 'ハヒフヘホ', category: 'basic' },
-  { id: 'm', name: 'm group', romaji: 'ma mi mu me mo', hira: 'まみむめも', kata: 'マミムメモ', category: 'basic' },
-  { id: 'y', name: 'y group', romaji: 'ya yu yo', hira: 'やゆよ', kata: 'ヤユヨ', category: 'basic' },
-  { id: 'r', name: 'r group', romaji: 'ra ri ru re ro', hira: 'らりるれろ', kata: 'ラリルレロ', category: 'basic' },
-  { id: 'w', name: 'w group', romaji: 'wa wo', hira: 'わを', kata: 'ワヲ', category: 'basic' },
-  { id: 'g', name: 'g group', romaji: 'ga gi gu ge go', hira: 'がぎぐげご', kata: 'ガギグゲゴ', category: 'sound-marked' },
-  { id: 'z', name: 'z group', romaji: 'za ji zu ze zo', hira: 'ざじずぜぞ', kata: 'ザジズゼゾ', category: 'sound-marked' },
-  { id: 'd', name: 'd group', romaji: 'da ji zu de do', hira: 'だぢづでど', kata: 'ダヂヅデド', category: 'sound-marked' },
-  { id: 'b', name: 'b group', romaji: 'ba bi bu be bo', hira: 'ばびぶべぼ', kata: 'バビブベボ', category: 'sound-marked' },
-  { id: 'p', name: 'p group', romaji: 'pa pi pu pe po', hira: 'ぱぴぷぺぽ', kata: 'パピプペポ', category: 'sound-marked' },
+  {
+    id: 'vowels',
+    name: 'vowels + n',
+    romaji: 'a i u e o n',
+    hira: 'あいうえおん',
+    kata: 'アイウエオン',
+    category: 'basic',
+  },
+  {
+    id: 'k',
+    name: 'k group',
+    romaji: 'ka ki ku ke ko',
+    hira: 'かきくけこ',
+    kata: 'カキクケコ',
+    category: 'basic',
+  },
+  {
+    id: 's',
+    name: 's group',
+    romaji: 'sa shi su se so',
+    hira: 'さしすせそ',
+    kata: 'サシスセソ',
+    category: 'basic',
+  },
+  {
+    id: 't',
+    name: 't group',
+    romaji: 'ta chi tsu te to',
+    hira: 'たちつてと',
+    kata: 'タチツテト',
+    category: 'basic',
+  },
+  {
+    id: 'n',
+    name: 'n group',
+    romaji: 'na ni nu ne no',
+    hira: 'なにぬねの',
+    kata: 'ナニヌネノ',
+    category: 'basic',
+  },
+  {
+    id: 'h',
+    name: 'h group',
+    romaji: 'ha hi fu he ho',
+    hira: 'はひふへほ',
+    kata: 'ハヒフヘホ',
+    category: 'basic',
+  },
+  {
+    id: 'm',
+    name: 'm group',
+    romaji: 'ma mi mu me mo',
+    hira: 'まみむめも',
+    kata: 'マミムメモ',
+    category: 'basic',
+  },
+  {
+    id: 'y',
+    name: 'y group',
+    romaji: 'ya yu yo',
+    hira: 'やゆよ',
+    kata: 'ヤユヨ',
+    category: 'basic',
+  },
+  {
+    id: 'r',
+    name: 'r group',
+    romaji: 'ra ri ru re ro',
+    hira: 'らりるれろ',
+    kata: 'ラリルレロ',
+    category: 'basic',
+  },
+  {
+    id: 'w',
+    name: 'w group',
+    romaji: 'wa wo',
+    hira: 'わを',
+    kata: 'ワヲ',
+    category: 'basic',
+  },
+  {
+    id: 'g',
+    name: 'g group',
+    romaji: 'ga gi gu ge go',
+    hira: 'がぎぐげご',
+    kata: 'ガギグゲゴ',
+    category: 'sound-marked',
+  },
+  {
+    id: 'z',
+    name: 'z group',
+    romaji: 'za ji zu ze zo',
+    hira: 'ざじずぜぞ',
+    kata: 'ザジズゼゾ',
+    category: 'sound-marked',
+  },
+  {
+    id: 'd',
+    name: 'd group',
+    romaji: 'da ji zu de do',
+    hira: 'だぢづでど',
+    kata: 'ダヂヅデド',
+    category: 'sound-marked',
+  },
+  {
+    id: 'b',
+    name: 'b group',
+    romaji: 'ba bi bu be bo',
+    hira: 'ばびぶべぼ',
+    kata: 'バビブベボ',
+    category: 'sound-marked',
+  },
+  {
+    id: 'p',
+    name: 'p group',
+    romaji: 'pa pi pu pe po',
+    hira: 'ぱぴぷぺぽ',
+    kata: 'パピプペポ',
+    category: 'sound-marked',
+  },
 ]
 
 const groupCategoryNames: Record<GroupCategory, string> = {
   basic: 'kana without marks',
   'sound-marked': 'kana with marks',
 }
-const groupCategories = Array.from(new Set(groups.map((group) => group.category)))
+const groupCategories = Array.from(
+  new Set(groups.map((group) => group.category)),
+)
 
 export const Route = createFileRoute('/multiple-choice')({
   head: () => ({ meta: [{ title: 'multiple choice · kana' }] }),
@@ -79,15 +191,20 @@ function MultipleChoiceSetup() {
     0,
   )
   const kanaCount = kanaPerScript * (script === 'both' ? 2 : 1)
-  const groupStatus = selectedGroups.length === 0
-    ? 'choose at least one group'
-    : selectedGroups.length === 1
-      ? selectedGroups[0].name
-      : `${selectedGroups.length} groups selected`
+  const groupStatus =
+    selectedGroups.length === 0
+      ? 'choose at least one group'
+      : selectedGroups.length === 1
+        ? selectedGroups[0].name
+        : `${selectedGroups.length} groups selected`
   const showHiragana = script !== 'katakana'
   const showKatakana = script !== 'hiragana'
-  const hiraganaPreview = previewCharacters(selectedGroups.map((group) => group.hira).join(''))
-  const katakanaPreview = previewCharacters(selectedGroups.map((group) => group.kata).join(''))
+  const hiraganaPreview = previewCharacters(
+    selectedGroups.map((group) => group.hira).join(''),
+  )
+  const katakanaPreview = previewCharacters(
+    selectedGroups.map((group) => group.kata).join(''),
+  )
   const previewRows = [
     { name: 'hiragana', visible: showHiragana, characters: hiraganaPreview },
     { name: 'katakana', visible: showKatakana, characters: katakanaPreview },
@@ -105,10 +222,14 @@ function MultipleChoiceSetup() {
   return (
     <>
       <header className="site-header setup-header">
-        <Link className="brand" to="/" aria-label="kana home">kana</Link>
+        <Link className="brand" to="/" aria-label="kana home">
+          kana
+        </Link>
       </header>
       <main className="home setup">
-        <Link className="setup-back" to="/">← activities</Link>
+        <Link className="setup-back" to="/">
+          ← activities
+        </Link>
         <h1>multiple choice</h1>
         <p className="intro">choose a script and one or more groups</p>
 
@@ -125,7 +246,9 @@ function MultipleChoiceSetup() {
                   onChange={() => setScript(item.id)}
                 />
                 <span className="script-indicator" aria-hidden="true" />
-                <span className="script-example" lang="ja" aria-hidden="true">{item.example}</span>
+                <span className="script-example" lang="ja" aria-hidden="true">
+                  {item.example}
+                </span>
                 <span className="script-name">{item.name}</span>
                 <span className="script-description">{item.description}</span>
               </label>
@@ -135,16 +258,22 @@ function MultipleChoiceSetup() {
 
         <section className="groups-section" aria-labelledby="groups-heading">
           <h2 id="groups-heading">groups to practice</h2>
-          <p className="group-guidance">start with vowels + n · other groups share a starting sound</p>
+          <p className="group-guidance">
+            start with vowels + n · other groups share a starting sound
+          </p>
           <div className="compact-toolbar">
             <div className="compact-actions">
               <button
                 type="button"
-                onClick={() => setSelectedIds(new Set(groups.map((group) => group.id)))}
+                onClick={() =>
+                  setSelectedIds(new Set(groups.map((group) => group.id)))
+                }
               >
                 select all
               </button>
-              <button type="button" onClick={() => setSelectedIds(new Set())}>clear</button>
+              <button type="button" onClick={() => setSelectedIds(new Set())}>
+                clear
+              </button>
             </div>
           </div>
 
@@ -154,9 +283,13 @@ function MultipleChoiceSetup() {
               {groupCategories.map((category) => (
                 <fieldset className="group-category" key={category}>
                   <legend className="group-divider" data-category={category}>
-                    <span className="group-category-label">{groupCategoryNames[category]}</span>
+                    <span className="group-category-label">
+                      {groupCategoryNames[category]}
+                    </span>
                     {category === 'sound-marked' && (
-                      <span className="sound-marked-help">marks change sounds · ka → ga · ha → pa</span>
+                      <span className="sound-marked-help">
+                        marks change sounds · ka → ga · ha → pa
+                      </span>
                     )}
                   </legend>
                   <div className="group-options">
@@ -169,10 +302,14 @@ function MultipleChoiceSetup() {
                             name="groups"
                             value={group.id}
                             checked={selectedIds.has(group.id)}
-                            onChange={(event) => toggleGroup(group.id, event.target.checked)}
+                            onChange={(event) =>
+                              toggleGroup(group.id, event.target.checked)
+                            }
                           />
                           <span className="group-name">{group.name}</span>
-                          <span className="group-sample" lang="ja">{groupSample(group, script)}</span>
+                          <span className="group-sample" lang="ja">
+                            {groupSample(group, script)}
+                          </span>
                           <span className="group-romaji">{group.romaji}</span>
                         </label>
                       ))}
@@ -182,12 +319,18 @@ function MultipleChoiceSetup() {
             </div>
           </fieldset>
 
-          <div className={`selected-preview${script === 'both' ? ' is-both' : ''}`}>
+          <div
+            className={`selected-preview${script === 'both' ? ' is-both' : ''}`}
+          >
             <p className="selected-preview-label">selected kana</p>
             {previewRows.map((row) => (
               <div className="preview-row" key={row.name}>
-                {script === 'both' && <span className="preview-script">{row.name}</span>}
-                <p className="selected-kana" lang="ja">{row.characters || '—'}</p>
+                {script === 'both' && (
+                  <span className="preview-script">{row.name}</span>
+                )}
+                <p className="selected-kana" lang="ja">
+                  {row.characters || '—'}
+                </p>
               </div>
             ))}
             <p
@@ -203,7 +346,9 @@ function MultipleChoiceSetup() {
         <div className="session-footer">
           <div className="session-details">
             <p className="session-summary">five answer choices in romaji</p>
-            <p className="romaji-note">romaji shows kana sounds with roman letters</p>
+            <p className="romaji-note">
+              romaji shows kana sounds with roman letters
+            </p>
           </div>
           <button className="preview-start" type="button" disabled>
             practice coming soon
