@@ -31,7 +31,7 @@ Study sessions need to be easy to start and stop because available time varies. 
 - Initial release is static and does not require accounts.
 - The home screen offers multiple choice, matching, and flashcards as practice-format choices, ordered from more guidance to recall.
 - Multiple choice opens a kana-led setup with hiragana, katakana, or both. Practice sessions are coming soon.
-- Flashcard progress is saved in this browser only; see docs/adr/0001-local-progress-in-browser-storage.md.
+- Study progress is saved in this browser only; see docs/adr/0001-local-progress-in-browser-storage.md.
 - Login, syncing across devices, and streaks are long-term ideas.
 - The home screen is designed before its practice flows.
 
@@ -58,5 +58,5 @@ No deployed product, user research, testimonials, or outcome data exists yet.
 
 - Everything is usable by keyboard alone.
 - Text meets WCAG AA contrast in the dark theme.
-- Transitions are short and are removed under reduced motion.
-- Revealing a flashcard is announced to screen readers.
+- Transitions are under 200ms and are removed under reduced motion.
+- Revealing a flashcard is announced to screen readers, and focus moves to the first grade button.
