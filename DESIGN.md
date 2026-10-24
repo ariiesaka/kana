@@ -86,6 +86,13 @@ Fonts are self-hosted. IBM Plex Sans comes from the `@fontsource/ibm-plex-sans` 
 
 Grading uses a subtle pair: `--color-knew` and `--color-missed`. Each appears next to the words "knew it" or "missed", and the pair is never the only signal.
 
+## Actions
+
+- Primary action: a solid button in the text color, at most one per screen (for example "back to activities").
+- Secondary action: an outlined button with the control line, for choices that start something (for example "reset progress").
+- Danger action: outlined in `--color-attention`, shown only after a confirmation step and always labeled in words ("yes, reset everything").
+- Back and settings links: muted underlined text at the top of the column.
+
 ## Not here
 
 No component library and no light theme. Add a primitive only when a second screen needs the same thing.

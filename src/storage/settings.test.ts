@@ -97,6 +97,53 @@ describe('reset', () => {
   })
 })
 
+describe('data this version cannot read', () => {
+  const newer = JSON.stringify({
+    version: 99,
+    progress,
+    settings: { scripts: 'both' },
+  })
+
+  test('saving progress never overwrites data from a newer version', () => {
+    const storage = fakeStorage({ [STORAGE_KEY]: newer })
+    createProgressStore(storage).save(progress)
+    expect(storage.data.get(STORAGE_KEY)).toBe(newer)
+  })
+
+  test('saving settings never overwrites data from a newer version', () => {
+    const storage = fakeStorage({ [STORAGE_KEY]: newer })
+    createProgressStore(storage).saveSettings({ scripts: 'hiragana' })
+    expect(storage.data.get(STORAGE_KEY)).toBe(newer)
+  })
+
+  test('garbage that is not saved data is replaced by the next save', () => {
+    const storage = fakeStorage({ [STORAGE_KEY]: '{not json' })
+    const store = createProgressStore(storage)
+    store.save(progress)
+    expect(createProgressStore(storage).load()).toEqual(progress)
+  })
+})
+
+describe('whether reset worked', () => {
+  test('says so when the saved data was cleared', () => {
+    expect(createProgressStore(fakeStorage()).reset()).toBe(true)
+  })
+
+  test('says so when there is no storage, since there is nothing to clear', () => {
+    expect(createProgressStore(undefined).reset()).toBe(true)
+  })
+
+  test('admits it when the browser refuses the write', () => {
+    const store = createProgressStore({
+      getItem: () => null,
+      setItem: () => {
+        throw new Error('blocked')
+      },
+    })
+    expect(store.reset()).toBe(false)
+  })
+})
+
 describe('when browser storage is unavailable', () => {
   test('settings load as the defaults, and saving and resetting do nothing', () => {
     const store = createProgressStore(undefined)

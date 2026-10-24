@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   DEFAULT_SETTINGS,
   type ScriptChoice,
@@ -28,7 +28,7 @@ const choices: Array<{
     id: 'both',
     name: 'hiragana and katakana',
     example: 'あ ア',
-    description: 'katakana follows each group',
+    description: 'katakana practice is coming soon',
   },
 ]
 
@@ -37,34 +37,44 @@ function SettingsScreen() {
     progressStore.loadSettings(),
   )
   const [confirming, setConfirming] = useState(false)
-  const [resetDone, setResetDone] = useState(false)
+  // what the reset screen says: nothing yet, done, or refused by the browser
+  const [resetResult, setResetResult] = useState<'done' | 'failed' | null>(null)
+  // true once the learner has used the reset buttons, so focus goes back to them
+  const [returnFocus, setReturnFocus] = useState(false)
   const resetRef = useRef<HTMLButtonElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
+
+  // focus follows the flow: confirming starts on the safe button, and leaving
+  // the confirmation returns to the reset button
+  useEffect(() => {
+    if (confirming) cancelRef.current?.focus()
+    else if (returnFocus) resetRef.current?.focus()
+  }, [confirming, returnFocus])
 
   function choose(scripts: ScriptChoice) {
     const next = { scripts }
     setSettings(next)
+    setResetResult(null)
     progressStore.saveSettings(next)
   }
 
   function askToReset() {
-    setResetDone(false)
+    setResetResult(null)
+    setReturnFocus(false)
     setConfirming(true)
-    // wait for the confirm buttons to exist, then start on the safe one
-    requestAnimationFrame(() => cancelRef.current?.focus())
   }
 
   function cancelReset() {
+    setReturnFocus(true)
     setConfirming(false)
-    requestAnimationFrame(() => resetRef.current?.focus())
   }
 
   function reset() {
-    progressStore.reset()
-    setSettings(DEFAULT_SETTINGS)
+    const worked = progressStore.reset()
+    if (worked) setSettings(DEFAULT_SETTINGS)
+    setResetResult(worked ? 'done' : 'failed')
+    setReturnFocus(true)
     setConfirming(false)
-    setResetDone(true)
-    requestAnimationFrame(() => resetRef.current?.focus())
   }
 
   return (
@@ -137,7 +147,10 @@ function SettingsScreen() {
             </button>
           )}
           <p className="reset-status" aria-live="polite">
-            {resetDone ? 'progress reset' : ''}
+            {resetResult === 'done' ? 'progress reset' : ''}
+            {resetResult === 'failed'
+              ? 'this browser would not let kana reset'
+              : ''}
           </p>
         </section>
       </main>
