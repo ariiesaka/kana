@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { cardsOfGroup, counterpart } from '#/kana/kana'
+import { allCards, counterpart } from '#/kana/kana'
 import {
   buildQueue,
   currentCard,
@@ -16,8 +16,9 @@ export const Route = createFileRoute('/practice')({
   component: Practice,
 })
 
-// the cards that can be practiced for now: the vowels in hiragana
-const pool = cardsOfGroup('vowels', 'hiragana')
+// the cards that can be practiced for now: all of hiragana, in learning order;
+// new cards come from one group at a time as the earlier groups become reliable
+const pool = allCards('hiragana')
 
 function Practice() {
   // saved progress decides what is due today; this runs once, when the screen opens
@@ -92,7 +93,7 @@ function Practice() {
             </h2>
             <p className="intro">
               {initial.count === 0
-                ? 'the next cards are ready tomorrow'
+                ? 'come back later for the next cards'
                 : "you went through today's cards"}
             </p>
             <Link ref={homeRef} to="/" className="primary-action">
